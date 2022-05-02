@@ -54,9 +54,13 @@ jwt.sign(json_claim,privateKey,{algorithm:"RS256"},function(err, token){
   .then(function (response) {
     console.log(response.data);
 
+
+
     })
   .catch(function (error) {
     console.log(error);
   });
 })
+
+
 
