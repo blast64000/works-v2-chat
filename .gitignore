@@ -1,0 +1,32 @@
+#ignore file
+*.pdf
+*.ini
+*.txt
+*.json
+*.out
+
+# exclude this file 
+
+package-lock.json
+
+#ignore node_nodules 
+
+node_modules/
+
+#ignore certificate
+
+certificate/
+
+#ignore react
+
+drawtree/
+
+
+#ignore botImgFile
+botImgFile/
+
+#ignore log file 
+log/
+backup/
+#ignore configfile
+config/
