@@ -10,7 +10,6 @@ const router = express.Router()
 // simple logger for this router's requests
 // all requests to this router will first hit this middleware
 
-
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended:false}));
 
