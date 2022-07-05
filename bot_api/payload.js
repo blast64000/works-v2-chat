@@ -58,7 +58,7 @@ payload["modifyDomain_Post"] = {
 payload["modifyDomain_Get"] = {};
 
 payload["modifyDomain_Put"] = {
-  visible:false
+  visible:true
 };
 payload["modifyDomain_Patch"] = {
   visible:true
@@ -74,27 +74,74 @@ payload["modifyBotUser_Delete"] = {};
 
 payload["addRichMenu_Post"] = {
 
-  "richmenuName": "Example Richmenu",
+  "richmenuName": "펙수 메인 리치메뉴",
   "areas": [
+    //1.메인화면
     {
       "action": {
         "type": "postback",
-        "label": "Example label",
-        "data": "Example data",
-        "displayText": "Example displayText",
-        "postback":"postback"
+        "label": "메인 화면",
+        "displayText": "메인 화면",
+        "data":"test",
+        "postback":"c100-70010"
       },
       "bounds": {
         "x": 0,
         "y": 0,
-        "width": 2500,
+        "width": 1250,
+        "height": 843
+      }
+    },
+    //2.펙수클루 제품개요
+    {
+      "action": {
+        "type": "postback",
+        "label": "제품 개요",
+        "displayText": "제품 개요",
+        "data":"test",
+        "postback":"c100-70011"
+      },
+      "bounds": {
+        "x": 1250,
+        "y": 0,
+        "width": 1250,
+        "height": 843
+      }
+    },//3.파이프라인
+    {
+      "action": {
+        "type": "postback",
+        "label": "파이프라인",
+        "displayText": "파이프라인",
+        "data":"test",
+        "postback":"c100-70012"
+      },
+      "bounds": {
+        "x": 0,
+        "y": 843,
+        "width": 1250,
+        "height": 843
+      }
+    },//4.성공모델
+    {
+      "action": {
+        "type": "postback",
+        "label": "성공모델",
+        "displayText": "성공모델",
+        "data":"test",
+        "postback":"c100-70013"
+      },
+      "bounds": {
+        "x": 1250,
+        "y": 843,
+        "width": 1250,
         "height": 843
       }
     }
   ],
   "size": {
     "width": 2500,
-    "height": 843
+    "height": 1686
   }
 
 };
@@ -108,7 +155,7 @@ payload["appendRichMenuImage_Get"] = {
 };
 
 payload["appendRichMenuImage_Post"] = {
-    "fileId": "jp1.1628695315008671000.1628781715.0.1000001.0.0.0"
+    "fileId": "kr1.1656986095073811450.1657072495.1.3873810.0.0.0"
 };
 
 

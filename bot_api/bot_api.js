@@ -3,6 +3,10 @@ const qs = require("qs");
 const fs = require("fs");
 const axios = require("axios");
 const pay = require("./payload.js");
+const FormData = require('form-data');
+const request = require('request');
+
+
 
 
 let baseHeaders={
@@ -14,25 +18,68 @@ const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
     if(err) throw err;
     baseHeaders.Authorization += JSON.parse(data).access_token;
-    console.log(baseHeaders.Authorization);
     reqConfig = axios.create({
       baseURL: 'https://www.worksapis.com/v1.0/',
       headers: baseHeaders,
       timeout: 1000});
+//richID  : 144430
+/*
+{
+  uploadUrl: 'http://apis-storage.worksmobile.com/k/emsg/r/kr1/1656986095073811450.1657072495.1.3873810.0.0.0/fexu_2500_1686.png',
+  fileId: 'kr1.1656986095073811450.1657072495.1.3873810.0.0.0'
+}
+*/
+
+
+    //enrollfileLink("3873810","fexu_2500_1686.png");
+    //uploadfile("fexu_2500_1686.png",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1656986095073811450.1657072495.1.3873810.0.0.0/fexu_2500_1686.png`);
+    //appendRichMenuImage("POST","3873810",'144430'); 
+    modifyBot("PATCH","3873810",{defaultRichmenuId:"144430"})
+    //modifyBot("GET","3812571")
+    //get_users_email("blast64000@hbcookie.com")
     //addBot("GET");
-    //addRichMenu("GET","3812571");  //144383
-    //enrollImageLink("3812571","test.png");
-    //modifyRichMenu("DELETE","3812571","144383");
+    //addRichMenu("POST","3873810");  //144383
+    //addRichMenu("GET","3812571");
+   
+   //modifyDomain("PUT","3812571","210997");
+
     })
 }
 
-// 7 . 컨텐츠 업로드 / 다운로드
-// POST/bots/{botId}/attachments 
-// GET/bots/{botId}/attachments/{fileId}
-let enrollImageLink = async function(botId,fn){
+//'http://apis-storage.worksmobile.com/k/emsg/r/kr1/1656636347569624838.1656722747.1.3812571.0.0.0/test1.png'
+let uploadfile = async function(filename,url){
+
+  let options = {
+    'method': 'POST',
+    'url': url,
+    'headers': {
+      'Authorization': `${baseHeaders.Authorization}`,
+      'Cookie': 'WORKS_RE_LOC=kr1; WORKS_TE_LOC=kr1'
+    },
+    formData: {
+      filename: {
+        'value': fs.createReadStream(filename),
+        'options': {
+          'filename': filename,
+          'contentType': null
+        }
+      }
+    }
+  };
+  
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body);
+  });
+  
+
+
+  }
+
+let enrollfileLink = async function(botId,fn){
   apiFunc = await reqConfig.post(`/bots/${botId}/attachments`, {fileName:fn});
   console.log(apiFunc.data);
-}
+};
 
 //POST : 리치메뉴 등록, GET : 리치메뉴 조회
 let addRichMenu = async function (rest,botId) {
