@@ -21,32 +21,22 @@ const Main = async function (){
     reqConfig = axios.create({
       baseURL: 'https://www.worksapis.com/v1.0/',
       headers: baseHeaders,
-      timeout: 1000});
-//richID  : 144430
-/*
-{
-  uploadUrl: 'http://apis-storage.worksmobile.com/k/emsg/r/kr1/1656986095073811450.1657072495.1.3873810.0.0.0/fexu_2500_1686.png',
-  fileId: 'kr1.1656986095073811450.1657072495.1.3873810.0.0.0'
-}
-*/
-
+      timeout: 3000});
 
     //enrollfileLink("3873810","fexu_2500_1686.png");
     //uploadfile("fexu_2500_1686.png",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1656986095073811450.1657072495.1.3873810.0.0.0/fexu_2500_1686.png`);
     //appendRichMenuImage("POST","3873810",'144430'); 
-    modifyBot("PATCH","3873810",{defaultRichmenuId:"144430"})
-    //modifyBot("GET","3812571")
-    //get_users_email("blast64000@hbcookie.com")
+    //modifyBot("PATCH","3873810",{allowDomains: [ 210997 ]})
+    modifyBotUser("GET","3873810","210997");
+    //modifyBot("GET","3873810")
+    //get_users_email("test01@hbcookie.com")
     //addBot("GET");
     //addRichMenu("POST","3873810");  //144383
     //addRichMenu("GET","3812571");
-   
    //modifyDomain("PUT","3812571","210997");
 
     })
 }
-
-//'http://apis-storage.worksmobile.com/k/emsg/r/kr1/1656636347569624838.1656722747.1.3812571.0.0.0/test1.png'
 let uploadfile = async function(filename,url){
 
   let options = {

@@ -79,7 +79,7 @@ payload["addRichMenu_Post"] = {
     //1.메인화면
     {
       "action": {
-        "type": "postback",
+        "type": "message",
         "label": "메인 화면",
         "displayText": "메인 화면",
         "data":"test",
@@ -95,7 +95,7 @@ payload["addRichMenu_Post"] = {
     //2.펙수클루 제품개요
     {
       "action": {
-        "type": "postback",
+        "type": "message",
         "label": "제품 개요",
         "displayText": "제품 개요",
         "data":"test",
@@ -110,7 +110,7 @@ payload["addRichMenu_Post"] = {
     },//3.파이프라인
     {
       "action": {
-        "type": "postback",
+        "type": "message",
         "label": "파이프라인",
         "displayText": "파이프라인",
         "data":"test",
@@ -125,7 +125,7 @@ payload["addRichMenu_Post"] = {
     },//4.성공모델
     {
       "action": {
-        "type": "postback",
+        "type": "message",
         "label": "성공모델",
         "displayText": "성공모델",
         "data":"test",

@@ -15,7 +15,9 @@ const bodyParser = require("body-parser")
 let options = require("./options.js")
 const initFunc = require("./axios_post.js")
 const dbconn = require("./db-conn.js")
-const lklist = require("./ln-list.js")
+const lklist = require("./ln-list.js");
+const { wrap } = require("module");
+const { Console } = require("console");
 
 const app = express()
 
@@ -94,6 +96,19 @@ const forLoop = async (a1, a2, befMsg,aftMsg, recvBody) => {
 
 };
 
+let sendMsg = function(){
+
+    
+}
+
+
+let responseBotMsg = async function(obj){
+    for await (let ti of obj){
+        await axios();
+    }
+};
+
+
 let sendMsgfile = function (paraOpt) {
     //console.log(JSON.stringify(paraOpt.json));
     return new Promise((resolve, reject) => {
@@ -152,7 +167,7 @@ let sendMsgfile = function (paraOpt) {
 
 };
 
-let fundBotNumber = function (worksBotNo) {
+let isVaildBot = function (worksBotNo) {
     //global scope : botInstList
     for (bi of botInstList) {
         if (bi.botWorksCode === worksBotNo) {
@@ -252,19 +267,15 @@ let readObjectinfo = function (readObject) {
 
     //date
     dataToSend = ""
-
     var bash = spawn('sh', ['upload_object.sh']);
-
     bash.stdout.on('data', function (data) {
         console.log("Pipe data from bash script");
         dataToSend = data.toString();
         console.log(dataToSend);
     });
-
     //write
     bash.on('close', (code) => {
         console.log(code);
-
         var d = new Date();
         let curtime = d.getFullYear() + "-" + ("00" + (d.getMonth() + 1)).slice(-2) + "-" + ("00" + d.getDate()).slice(-2) + " " + ("00" + d.getHours()).slice(-2) + ":" + ("00" + d.getMinutes()).slice(-2) + ":" + ("00" + d.getSeconds()).slice(-2)
         console.log(curtime);
@@ -274,25 +285,26 @@ let readObjectinfo = function (readObject) {
             console.log(data.toString());
 
             if (data.toString().match("x-works-resource-id")) {
-
             }
-
         });
-
-
     });
-
-
-
 }
 
 
 const initialize = async function () {
-    let res = await initFunc.getJWT();
-    options.headers.Authorization =`Bearer ${res.access_token}`
-    console.log(JSON.stringify(res));
-    await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
+    let res = {};
+    // 하루 1회 리딩
+    //res = await initFunc.getJWT();
+    //await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
 
+    // 이후 book.txt 리드
+    const data1 = await fs.readFileSync('books.txt',{encoding:'utf8', flag:'r'});
+
+    if(data1.hasOwnProperty(data1.access_token)){
+        options.headers.Authorization =`Bearer ${res.access_token}`
+    }
+
+    
     dbconn.readMasterTable(options.dbpool).then(function (data) {
         masterData.chatBotList = data[0].slice(0, data[0].length);
         masterData.contentList = data[1].slice(0, data[1].length);
@@ -330,7 +342,6 @@ const initialize = async function () {
         for (let ai of actionInstList) {
             ai.appendNextCont(contentInstList);
         }
-
         console.log("6.====init Sales Member config ==== ");
         saleInstList = masterData.saleList;
         console.log(saleInstList);
@@ -338,12 +349,18 @@ const initialize = async function () {
         console.log("7.====activate server config ==== ");
         console.log('server has started.');
     });
-
-
-
-
 }
 
+const wraper = asyncFn => {
+    // FIXME: Promise와 catch를 이용하면 더 간결해질 것 같습니다.
+      return (async (req, res, next) => {
+        try {
+          return await asyncFn(req, res, next)
+        } catch (error) {
+          return next(error)
+        }
+      })  
+    }
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -354,6 +371,37 @@ app.all('*', function (req, res, next) {
     next();
 });
 
+
+//post 요청사항 사전검사{봇 존재 여부, 봇 코드 존재여부}
+app.post("*", wraper(async (req, res, next) => {
+    const { headers, method, url } = req;
+    //    console.log(Object.keys(req));
+
+    console.log(`\n== check all input method: ${method}, url :${url} ==`);
+
+    if(isVaildBot(headers["x-works-botid"])){
+        next();
+    } 
+    else {
+        console.log("it's not a vaild bot");
+        res.status(404).end();
+    }
+}));
+
+//await new Promise(r => setTimeout(r, 5000 * Math.random()));
+app.post("/fexu", wraper(async (req, res, next) => {
+    // 로깅 시작
+    
+    // answerObj = [obj1, obj2, obj3, obj4];
+    let answerObj = await vaildateMessage(req);
+    let retMsg = await responseBotMsg([1000,2000,3000,4000]);
+
+    // 데이터 전송
+    //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
+        
+  }));
+
+
 app.get("/botImgFile/*", function (req, res) {
     console.log("botImgfile")
     const { headers, method, url } = req;
@@ -363,247 +411,36 @@ app.get("/botImgFile/*", function (req, res) {
 });
 
 
-app.post("/fexu", function (req, res) {
-    const { headers, method, url } = req;
-    options.url = `https://www.worksapis.com/v1.0/bots/${options.botNo}/users/${req.body.source.userId}/messages`
-    options.headers.TTL = 2;
-    let body = [];
-    let reqBody = { accountId: "", content: {} };
-
-    options.headers["Content-Type"] = "application/json"
-    let recvBody = req.body;
-
-    reqBody.accountId = recvBody.source.accountId;
-    console.log("==recived body");
-    console.log(recvBody);
-    console.log(headers);
-    if (recvBody.content == undefined && recvBody.type === "postback") {
-        recvBody.content = {};
-        recvBody.content.type = "text";
-        recvBody.content.text = recvBody.data;
-        recvBody.content.postback = recvBody.data;
-    }
-    recvBody.recvType = undefined;
-
-    if (recvBody.content.type === "text") {
-        console.log("it's text")
-        let myBotNode = fundBotNumber(headers['x-works-botid']);
-        //
-        if (myBotNode) {
-            if (!recvBody.content.postback) {
-                if (!recvBody.recvType) {
-                    recvBody.recvType = "User_txt_input";
-                }
-                // #search
-                if (recvBody.content.text.charCodeAt(0) === 35) {
-                    reqBody.content.type = "carousel";
-                    temp1 = hashSearch(recvBody.content.text.slice(1).toUpperCase(), myBotNode.botCode);
-                    if (temp1.length == 0) {
-                        reqBody.content.type = "text";
-                        reqBody.content.text = "검색결과가 없습니다.";
-                        recvBody.recvType = "Text_return";
-                    } else {
-                        reqBody.content.columns = temp1;
-                    }
-
-                }
-                // TextList 순회 
-                else {
-                    let textListFlag = 0;
-                    for (let ti of myBotNode.botRevTxtList) {
-
-                        if (recvBody.content.text === ti.TXT_INP_TXT) {
-
-                            //지정 Cont 리턴
-                            if (ti.IS_ENTRY) {
-                                let reqContent = findCurrCont(ti.TXT_CONT_CD, contentInstList);
-                                reqBody.content.type = reqContent.contType;
-
-                                if (reqContent.contType === "image") {
-
-                                    reqBody.content.previewUrl = reqContent.contPreImg;
-                                    reqBody.content.resourceUrl = reqContent.contOrgImg;
-
-                                    reqBody.content.previewImageUrl=reqContent.contPreImg;
-                                    reqBody.content.originalContentUrl= reqContent.contPreImg;
-
-                                    reqBody.content.aftMsg = reqContent.contAftMsg;
-                                    recvBody.recvType = "BT_return";
-                                    textListFlag++;
-                                    break;
-                                }
-                                else if (reqContent.contType === "button_template") {
-                                    //content type 이 button Template
-                                    reqBody.content.contentText = reqContent.contText;
-                                    reqBody.content.actions = makeActionJson(reqContent.contActionSet);
-                                    recvBody.recvType = "Img_return";
-                                    textListFlag++;
-                                    break;
-                                }
-                            }
-
-                            // 일반 텍스트 리턴
-                            else {
-                                textListFlag++;
-                                reqBody.content.type = "text";
-                                reqBody.content.text = ti.TXT_OUT_TXT;
-                                recvBody.recvType = "Text_return";
-
-                                break;
-                            }
-                        }
-                    }
-
-                    if (textListFlag === 0) {
-                        let reqContent = findCurrCont(myBotNode.botStartNode.contCode, contentInstList);
-                        reqBody.content.type = reqContent.contType
-                        reqBody.content.contentText = reqContent.contText;
-                        reqBody.content.actions = makeActionJson(reqContent.contActionSet);
-                        recvBody.recvType = "Img_return";
-
-                    }
-                }
+const vaildateMessage =  function (req) {    
+    return new Promise((resolve, reject) => {
+            console.log(req.body);
+            console.log(req.headers);
+            resolve();
+    }).catch(error => { 
+        console.log(error); 
+    });
 
 
-            }
-            //postback 있음
-            else {
-                let reqContent = findCurrCont(recvBody.content.postback, contentInstList);
-
-                if (!reqContent) {
-                    //오류 사항  CurrentCont  가 없을때 (시작하기 누를때)                            
-                }
-
-                else if (reqContent.contType === "image") {
-                    console.log(reqContent.contPreImg);
-                    reqBody.content.type = reqContent.contType;
-                    reqBody.content.previewUrl = reqContent.contPreImg;
-                    reqBody.content.resourceUrl = reqContent.contOrgImg;
-
-                    reqBody.content.previewImageUrl=reqContent.contPreImg;
-                    reqBody.content.originalContentUrl= reqContent.contPreImg;
-
-                    reqBody.content.aftMsg = reqContent.contAftMsg;
-                    reqBody.content.befMsg = reqContent.contBefMsg;
-
-                    recvBody.recvType = "Post_img";
-
-                }
-                else if (reqContent.contType === "button_template") {
-                    //content type 이 button Template
-
-                    reqBody.content.type = reqContent.contType;
-                    reqBody.content.contentText = reqContent.contText;
-                    reqBody.content.actions = makeActionJson(reqContent.contActionSet);
-                    recvBody.recvType = "Post_BT";
-                }
-
-                else if (reqContent.contType === "file") {
-
-                    console.log(reqContent.contImgId);
-
-                    if (reqContent.contImgId) {
-                        reqBody.content.type = reqContent.contType;
-                        reqBody.content.resourceId = reqContent.contImgId;
-
-                    } else {
-                        reqBody.content.type = reqContent.contType;
-                        reqBody.content.resourceUrl = reqContent.contPreImg;
-                    }
-                    recvBody.recvType = "Post_file"
-                }
-
-                else if (reqContent.contType === "text") {
-                    console.log(reqContent);
-                    reqBody.content.type = "text";
-                    reqBody.content.text = reqContent.contText;
-                    recvBody.recvType = "Text_return";
-                }
-                else if (reqContent.contType === "db_access") {
-                    let TFcounter = false;
-                    for (let sel of saleInstList) {
-                        if (recvBody.source.accountId === sel.SALE_EMAIL) {
-                            reqBody.content.type = "text";
-                            reqBody.content.text = `기준점 : ${sel.SALE_GROUND} \n 최종실적 : ${sel.SALE_FINAL} \n 성장금액 : ${sel.SALE_UP_AMT} \n 성장률 : ${sel.SALE_UP_PER} `
-                            recvBody.recvType = "Text_return";
-                            TFcounter = true;
-                        }
-                    }
-
-                    if (!TFcounter) {
-                        reqBody.content.type = "text";
-                        reqBody.content.text = `정의된 실적이 없습니다`
-                        recvBody.recvType = "Text_return";
-                    }
-                }
-
-                else {
+}
 
 
-                }
-            }
+    // 1.입력 데이터에 대한 로깅 
+        // (1)"안녕" 이라고 텍스트 입력
+        // (2)"#입력값" 이라고 검색 텍스트 입력 
+        // (3) 리치메뉴를 통한 입력
+        // (4) 버튼 템플릿으로 postback을 받은 경우
+        // (5) 
 
-        }
-        else {
-            console.log("bot is not exist");
-        }
-    }
-    //else if(recvBody.content.type==="image"){}
-    //else if(recvBody.content.type==="link") {}
-    //else if(recvBody.content.type==="sticker") {}            
-    //else if(recvBody.content.type==="file") {}
-    else {
+    // 응답 데이터 작성 부 
 
-    }
-
-    paraOpt = {
-        method: "POST",
-        url: options.url,
-        json: reqBody,
-        headers: options.headers
-    }
-
-
-
-    // 그림 여려개 예외처리 
-    if (reqBody.content.type === "image") {
-
-        if (!paraOpt.json.content.previewUrl) {
-            console.log("image url is null");
-            paraOpt.json.content.type = "text";
-            paraOpt.json.content.text = "등록 이미지 없음";
-            sendMsgfile(paraOpt);
-        }
-
-        else {
-            imgList = reqBody.content.previewUrl.split(";");
-            console.log("이미지 리스트");
-            console.log(imgList);
-            forLoop(paraOpt, imgList,reqBody.content.befMsg,reqBody.content.aftMsg, recvBody);
-        }
-
-
-
-        /*
-        paraOpt.json.content.type = 'button_template';
-        paraOpt.json.content.contentText = reqContent.contText;
-        paraOpt.json.content.actions = makeActionJson(reqContent.contActionSet);
-        sendMsgfile(paraOpt);
-        hi
-        */
-
-    }
-    else {
-        sendMsgfile(paraOpt);
-    }
-
-});
 app.post("/test", function (req, res) {
     //    console.log(Object.keys(req));
     console.log(req.body);
     res.end()
 });
 
-initialize();
-https.createServer(options, app).listen(80);
-https.createServer(options, app).listen(443);
+initialize().then(()=>{
+    https.createServer(options, app).listen(80);
+    https.createServer(options, app).listen(443);
+}
+)
