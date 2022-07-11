@@ -21,6 +21,14 @@ const { Console } = require("console");
 
 const app = express()
 
+let baseHeaders={
+    'Authorization': "Bearer ",
+      "Content-Type": `application/json`
+  };
+
+
+
+
 let masterData = {
     chatBotList: [],
     contentList: [],
@@ -35,137 +43,127 @@ let actionInstList = [];
 let textInstList = [];
 let saleInstList = [];
 
-const forLoop = async (a1, a2, befMsg,aftMsg, recvBody) => {
+let makeAnswerJson = function(botId,reqbody,contObj){
 
-    if (befMsg) {
-        await sendMsgfile({
-            method: "POST",
-            url: options.url,
-            json: {  content: { type: "text", text: befMsg } },
-            headers: options.headers
-        });
+    if(!contObj){
+        return 0;
     }
 
-    for (const iter of a2) {
-        if (!iter) {
-            continue;
-        }
-        else {
-            a1.json.content.previewUrl = iter;
-            a1.json.content.resourceUrl = iter;
-            a1.json.content.previewImageUrl=iter;
-            a1.json.content.originalContentUrl= iter;
+    console.log("===reqbody");
+    console.log(reqbody);
+    console.log("===contObj");
+    console.log(contObj);
 
-            await sendMsgfile(a1);
+let retObj = {
+    botId : botId,
+    userId : reqbody.source.userId,
+
+    json:{
+        content: {
+          }
         }
     }
 
-    
-    if (aftMsg) {
-        await sendMsgfile({
-            method: "POST",
-            url: options.url,
-            json: { content: { type: "text", text: aftMsg } },
-            headers: options.headers
-        });
-    }
+    switch (contObj.contType){
+        case "text":
+            break;
+        case "image":
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.previewImageUrl = contObj.contPreImg;
+            retObj.json.content.originalContentUrl = contObj.contOrgImg;
+            return retObj;
+            break;
 
-    if(recvBody.content.postback==="c100-70008"){
-        await sendMsgfile({
-            method: 'POST',
-            url: 'https://www.worksapis.com/v1.0/bots/3873810/users/ac5309e2-7faf-40aa-187b-03761aa46f2c/messages',
-            headers: {
-                consumerKey: '_IkFHBjcR7atGZQERQDZ',
-                Authorization: 'Bearer kr1AAABSviAYb+EARx3mo88OuQ134RaxsCov+tYiT976+80Az0eAo5c5nBlmeoDD+g98viVjBhNSBq6wvox1RHdgzQCKzvnEOwfAN6bxkP4+sAq5yMP7/BojyztICEByNL+z8KTi0hbhoRC16qClxqjQXnEOnYJHbI37lMpi5DPy63+I6kVpLPvy5BGB0C/F7uFZs4Tl/7QwXNY/gtAkDNeLzfiI01FYth5F0fhbZ2sLCWNSpBHaI0pIWy+qZ7Y4sAA157HdqzC1KT/jiFddynbnWioaD4/GdfIYG5WOWS89WFl5S4usZrukOiQ/BtjVfN/NF5RSxBc37kr6cUsG5DaoVbtc8PnCoqFQ/wtc+VIgboV0ukXMcgUzpWKVR8Jh/CgMQLVJ9OF8zCldpfMzopOPEZ7LgY8ZjjuzlBMkEKi+OjFcZud48fJ+dxihfrQ4enQqXVdlA==',
-                TTL: 2,
-                'Content-Type': 'application/json'
-              },
-            json: {
-                "content": {
-                    "type": "button_template",
-                    "contentText": "test",
-                    "actions": [{
-                        "type": "message",
-                        "label": "가역적/비가역적 저해제란?",
-                        "postback": "c100-70010"
-                    }]
-                }
+        case "button_template":
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.contentText = contObj.contText;
+            retObj.json.content.actions= [];
+            for( let qi of contObj.contActionSet){
+                retObj.json.content.actions.push({
+                    type:qi.actType,
+                    label:qi.actName,
+                    postback:qi.nextContCode
+                })
             }
-        });            
+            return retObj;
+            break;
+
+            default:
+                return {};
     }
-
 };
-
-let sendMsg = function(){
-
-    
-}
 
 
 let responseBotMsg = async function(obj){
+    let reqConfig = axios.create({
+        baseURL: `https://www.worksapis.com/v1.0/bots/`,
+        headers: baseHeaders,
+        timeout: 3000});
+    //test
+
     for await (let ti of obj){
-        await axios();
+        if(ti===0){continue};
+        let startTime = 0;
+        let endTime = 0;
+        
+        startTime = new Date().getTime();
+        apiFunc = await reqConfig.post(`${ti.botId}/users/${ti.userId}/messages`, ti.json);
+        endTime = new Date().getTime();
+        console.log(endTime-startTime);
+        await new Promise(resolve => setTimeout(resolve,900-(endTime-startTime)));
     }
 };
 
-
-let sendMsgfile = function (paraOpt) {
-    //console.log(JSON.stringify(paraOpt.json));
+const vaildateMessage =  function (req) {    
     return new Promise((resolve, reject) => {
-
-        console.log(paraOpt);
-        my_request({
-            method: paraOpt.method,
-            url: paraOpt.url,
-            json: paraOpt.json,
-            headers: paraOpt.headers
-        }, async function (err, response, body) {
-            console.log(body);
-            if (err) {
-                console.log('========= enter error ========.');
-                console.error(err);
-                reject();
-            } else {
-                if (response.statusCode === 200) {
-                    console.log("Success(200)")
-                    resolve();
+        retArray = []
+        const { headers, body } = req;
+        console.log(body);
+        //다음 지시자 있는 경우 
+        if(body.content.postback){ 
+            let pbCountList = req.body.content.postback.split(",");
+                for(let xi of pbCountList){
+                    retArray.push(
+                    makeAnswerJson(headers["x-works-botid"],body,findCurrCont(xi,contentInstList))
+                    )
                 }
-                else if (response.statusCode === 500) {
-                    console.log("Fail(500)" + JSON.stringify(response));
-                    console.log(body);
-                    if (response.request.headers.TTL > 0) {
-                        console.log(response.request.headers.TTL);
-                        paraOpt.headers.TTL = response.request.headers.TTL - 1;
-                        try {
-                            await sendMsgfile(paraOpt);
-                            resolve();
-                        } catch (e) {
-                            console.log(e)
-                            reject();
-                        }
-                    }
-                    else {
-                        reject();
-                        console.log("TTL is lower than 0");
-                    }
+                resolve(retArray)
+                // 컨텐츠 갯수 검사 
+                //Ident 검사
+                // 컨텐츠 전송 ( 간격 조정)
+        } 
+        //단순 텍스트 입력인 경우 
+        else if(body.content.type==="text") {
 
-                }
-
-                else {
-                    console.log("statusCode is undefined");
-                    reject();
+            let botInst = isVaildBot(headers["x-works-botid"]);
+            if(botInst){
+                for (let ti of botInst.botRevTxtList)
+                    if(ti.TXT_INP_TXT===body.content.text){
+                        let txtpbCountList = ti.TXT_CONT_CD.split(",");
+                        for(let zi of txtpbCountList){
+                            retArray.push(
+                                makeAnswerJson(headers["x-works-botid"],body,findCurrCont(zi,contentInstList))
+                                );
+                            }
+                        resolve(retArray)
                 }
             }
+            // # 검색 확인
 
+            
+            // 아닐경우 (자연어)
+
+
+            // 디폴트 
+
+            
         }
 
+    }).catch(error => { 
+        console.log(error); 
+    });
+}
 
-        )
-
-
-    }).catch(error => { console.log(error); });
-
-};
 
 let isVaildBot = function (worksBotNo) {
     //global scope : botInstList
@@ -294,16 +292,17 @@ let readObjectinfo = function (readObject) {
 const initialize = async function () {
     let res = {};
     // 하루 1회 리딩
-    //res = await initFunc.getJWT();
-    //await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
-
+    res = await initFunc.getJWT();
+    res.tokenTime = new Date();
+    await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
     // 이후 book.txt 리드
-    const data1 = await fs.readFileSync('books.txt',{encoding:'utf8', flag:'r'});
+    const fileRes = await fs.readFileSync('books.txt',{encoding:'utf8', flag:'r'});
+    const axOptions = JSON.parse(fileRes);
 
-    if(data1.hasOwnProperty(data1.access_token)){
-        options.headers.Authorization =`Bearer ${res.access_token}`
+    if(axOptions.access_token){
+        baseHeaders.Authorization +=axOptions.access_token
+        console.log(baseHeaders);
     }
-
     
     dbconn.readMasterTable(options.dbpool).then(function (data) {
         masterData.chatBotList = data[0].slice(0, data[0].length);
@@ -376,26 +375,26 @@ app.all('*', function (req, res, next) {
 app.post("*", wraper(async (req, res, next) => {
     const { headers, method, url } = req;
     //    console.log(Object.keys(req));
-
-    console.log(`\n== check all input method: ${method}, url :${url} ==`);
-
+    console.log(`\n== check post method: ${method}, url :${url} ==`);
     if(isVaildBot(headers["x-works-botid"])){
         next();
     } 
     else {
         console.log("it's not a vaild bot");
+        //필요하다면 meesage Text 로 현재 응답할 수 있는 상태가 아니다
         res.status(404).end();
     }
 }));
 
+
 //await new Promise(r => setTimeout(r, 5000 * Math.random()));
 app.post("/fexu", wraper(async (req, res, next) => {
     // 로깅 시작
-    
     // answerObj = [obj1, obj2, obj3, obj4];
     let answerObj = await vaildateMessage(req);
-    let retMsg = await responseBotMsg([1000,2000,3000,4000]);
-
+    console.log("=====answerobj : ");
+    console.log(answerObj);
+    let retMsg = await responseBotMsg(answerObj);
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
         
@@ -403,25 +402,18 @@ app.post("/fexu", wraper(async (req, res, next) => {
 
 
 app.get("/botImgFile/*", function (req, res) {
+
+    try{
     console.log("botImgfile")
     const { headers, method, url } = req;
     console.log("haha");
     console.log(url);
     res.sendFile(path.join(__dirname, url.replace(";", "")));
+    } catch(err){
+        console.log("img get error");
+    }
 });
 
-
-const vaildateMessage =  function (req) {    
-    return new Promise((resolve, reject) => {
-            console.log(req.body);
-            console.log(req.headers);
-            resolve();
-    }).catch(error => { 
-        console.log(error); 
-    });
-
-
-}
 
 
     // 1.입력 데이터에 대한 로깅 
