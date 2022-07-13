@@ -18,6 +18,7 @@ const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
     if(err) throw err;
     baseHeaders.Authorization += JSON.parse(data).access_token;
+
     reqConfig = axios.create({
       baseURL: 'https://www.worksapis.com/v1.0/',
       headers: baseHeaders,
