@@ -1,20 +1,24 @@
 
-const fs = require("fs");
-const axios = require("axios");
 const qs = require("qs");
 const jwt = require('jsonwebtoken');
+const fs = require("fs");
+const axios = require("axios");
+const options = require("./options.js")
+
 
 
 module.exports.getJWT = function(){
   return new Promise(function(resolve,reject){
 
+
+    
       let privateKey = fs.readFileSync('./config/private_20220418181840.key');
       let nowDateSecond = Math.floor(Date.now() / 1000);
       let expDateSecond = Math.floor(Date.now() / 1000) + 60
       
       json_claim = { 
-        "iss":"82DWWRpxARVVFrj3uicA",
-        "sub":"h0fgn.serviceaccount@hbcookie.com",
+        "iss":options.iss,
+        "sub":options.sub,
         "iat":nowDateSecond,
         "exp":expDateSecond
       }
@@ -26,10 +30,11 @@ module.exports.getJWT = function(){
           let reqString = qs.stringify({
             'assertion': token,
             'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-            'client_id': '82DWWRpxARVVFrj3uicA',
-            'client_secret': 'MMoxYQdn62',
+            'client_id': options.iss,
+            'client_secret': options.clisecret,
             'scope': 'bot,user.email.read'
           });
+        
   
           axios({
             method: "post",

@@ -1,11 +1,7 @@
 const fs = require("fs");
 const fsPromises = fs.promises;
 const axios = require("axios");
-const qs = require("qs");
-const jwt = require('jsonwebtoken');
 const path = require("path")
-const my_request = require("request")
-
 
 const http = require('http')
 const https = require('https')
@@ -66,6 +62,9 @@ let retObj = {
 
     switch (contObj.contType){
         case "text":
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.text = contObj.contText;
+            return retObj;
             break;
         case "image":
             retObj.json.content.type = contObj.contType;
@@ -110,7 +109,7 @@ let responseBotMsg = async function(obj){
         apiFunc = await reqConfig.post(`${ti.botId}/users/${ti.userId}/messages`, ti.json);
         endTime = new Date().getTime();
         console.log(endTime-startTime);
-        await new Promise(resolve => setTimeout(resolve,900-(endTime-startTime)));
+        await new Promise(resolve => setTimeout(resolve,1000-(endTime-startTime)));
     }
 };
 
@@ -121,10 +120,11 @@ const vaildateMessage =  function (req) {
         console.log(body);
         //다음 지시자 있는 경우 
         if(body.content.postback){ 
-            let pbCountList = req.body.content.postback.split(",");
+            let pbCountList = body.content.postback.split(",");
+            console.log(pbCountList);
                 for(let xi of pbCountList){
                     retArray.push(
-                    makeAnswerJson(headers["x-works-botid"],body,findCurrCont(xi,contentInstList))
+                    makeAnswerJson(headers["x-works-botid"],body,findCurrCont(xi.trim(),contentInstList))
                     )
                 }
                 resolve(retArray)
@@ -262,7 +262,6 @@ let makeActionJson = function (actionSetData) {
 };
 
 let readObjectinfo = function (readObject) {
-
     //date
     dataToSend = ""
     var bash = spawn('sh', ['upload_object.sh']);
@@ -369,7 +368,6 @@ app.all('*', function (req, res, next) {
     console.log(`\n== check all input method: ${method}, url :${url} ==`);
     next();
 });
-
 
 //post 요청사항 사전검사{봇 존재 여부, 봇 코드 존재여부}
 app.post("*", wraper(async (req, res, next) => {

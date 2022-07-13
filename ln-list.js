@@ -1,3 +1,4 @@
+// ♥ : [] 되있는거 다 Map 구조로 바꾸기 
 
 let ContNode = class {
     constructor(data) {
@@ -34,8 +35,10 @@ let ActNode = class {
         this.actType = data.ACT_TYPE;
         this.actName = data.ACT_NM;
         this.nextContCode = data.ACT_CONT_CD;
+        this.actIdentCode = data.ACT_IDENT_CD;
         this.nextNode = null;
     }
+    
     appendNextCont(contentList) {
         for (let xi = 0; xi < contentList.length; xi++) {
             if (this.nextContCode === contentList[xi].contCode) {
