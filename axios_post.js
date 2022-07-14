@@ -12,7 +12,7 @@ module.exports.getJWT = function(){
 
 
     
-      let privateKey = fs.readFileSync('./config/private_20220418181840.key');
+      let privateKey = fs.readFileSync('./config/private_20220622084023.key');
       let nowDateSecond = Math.floor(Date.now() / 1000);
       let expDateSecond = Math.floor(Date.now() / 1000) + 60
       

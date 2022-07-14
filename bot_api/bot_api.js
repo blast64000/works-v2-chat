@@ -24,15 +24,19 @@ const Main = async function (){
       headers: baseHeaders,
       timeout: 3000});
 
-    //enrollfileLink("3873810","fexu_2500_1686.png");
-    //uploadfile("fexu_2500_1686.png",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1656986095073811450.1657072495.1.3873810.0.0.0/fexu_2500_1686.png`);
-    //appendRichMenuImage("POST","3873810",'144430'); 
-    //modifyBot("PATCH","3873810",{allowDomains: [ 210997 ]})
-    modifyBotUser("GET","3873810","210997");
+    modifyBot("PATCH","3904290",{"defaultRichmenuId":"144526"})
+    //modifyBotUser("GET","3873810","210997");
     //modifyBot("GET","3873810")
     //get_users_email("test01@hbcookie.com")
     //addBot("GET");
-    //addRichMenu("POST","3873810");  //144383
+
+    //리치메뉴 등록 세트
+    //addRichMenu("GET","3904290");  //144383
+    //enrollfileLink("3904290","fexu_2500_843.png");
+    //uploadfile("fexu_2500_843.png",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1657777541597561865.1657863941.1.3904290.0.0.0/fexu_2500_843.png`);
+    //appendRichMenuImage("POST","3904290",'144526'); 
+
+
     //addRichMenu("GET","3812571");
    //modifyDomain("PUT","3812571","210997");
 

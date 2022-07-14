@@ -6,21 +6,28 @@ const path = require("path")
 const http = require('http')
 const https = require('https')
 
+
+const converter = require('json-2-csv');
 const express = require("express")
 const bodyParser = require("body-parser")
 let options = require("./options.js")
 const initFunc = require("./axios_post.js")
 const dbconn = require("./db-conn.js")
 const lklist = require("./ln-list.js");
-const { wrap } = require("module");
-const { Console } = require("console");
+const { type } = require("os");
+const { text } = require("express");
+
+
+
+
+
 
 const app = express()
 
-let baseHeaders={
+let baseHeaders = {
     'Authorization': "Bearer ",
-      "Content-Type": `application/json`
-  };
+    "Content-Type": `application/json`
+};
 
 
 
@@ -39,9 +46,10 @@ let actionInstList = [];
 let textInstList = [];
 let saleInstList = [];
 
-let makeAnswerJson = function(botId,reqbody,contObj){
 
-    if(!contObj){
+let makeAnswerJson = function (botId, reqbody, contObj) {
+
+    if (!contObj) {
         return 0;
     }
 
@@ -50,18 +58,19 @@ let makeAnswerJson = function(botId,reqbody,contObj){
     console.log("===contObj");
     console.log(contObj);
 
-let retObj = {
-    botId : botId,
-    userId : reqbody.source.userId,
+    let retObj = {
+        botId: botId,
+        userId: reqbody.source.userId,
 
-    json:{
-        content: {
-          }
+        json: {
+            content: {
+            }
         }
     }
 
-    switch (contObj.contType){
+    switch (contObj.contType) {
         case "text":
+            if(contObj.contText===""){return  0};
             retObj.json.content.type = contObj.contType;
             retObj.json.content.text = contObj.contText;
             return retObj;
@@ -76,91 +85,123 @@ let retObj = {
         case "button_template":
             retObj.json.content.type = contObj.contType;
             retObj.json.content.contentText = contObj.contText;
-            retObj.json.content.actions= [];
-            for( let qi of contObj.contActionSet){
+            retObj.json.content.actions = [];
+            for (let qi of contObj.contActionSet) {
                 retObj.json.content.actions.push({
-                    type:qi.actType,
-                    label:qi.actName,
-                    postback:qi.nextContCode
+                    type: qi.actType,
+                    label: qi.actName,
+                    postback: qi.nextContCode
                 })
             }
             return retObj;
             break;
 
-            default:
-                return {};
+        case "carousel":
+            console.log(contObj);
+            if(!contObj.outArray){return  0};
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.columns = contObj.outArray;
+            return retObj;
+            break;
+
+        default:
+            return {};
     }
 };
 
 
-let responseBotMsg = async function(obj){
+let responseBotMsg = async function (obj) {
     let reqConfig = axios.create({
         baseURL: `https://www.worksapis.com/v1.0/bots/`,
         headers: baseHeaders,
-        timeout: 3000});
+        timeout: 3000
+    });
     //test
 
-    for await (let ti of obj){
-        if(ti===0){continue};
+    for await (let ti of obj) {
+        if (ti === 0) { continue };
         let startTime = 0;
         let endTime = 0;
-        
+
         startTime = new Date().getTime();
         apiFunc = await reqConfig.post(`${ti.botId}/users/${ti.userId}/messages`, ti.json);
         endTime = new Date().getTime();
-        console.log(endTime-startTime);
-        await new Promise(resolve => setTimeout(resolve,1000-(endTime-startTime)));
+        console.log(endTime - startTime);
+        await new Promise(resolve => setTimeout(resolve,
+            (endTime - startTime) > 0 ? (1000-(endTime - startTime)) : 10));
     }
 };
 
-const vaildateMessage =  function (req) {    
+const vaildateMessage = function (req) {
     return new Promise((resolve, reject) => {
         retArray = []
         const { headers, body } = req;
-        console.log(body);
-        //다음 지시자 있는 경우 
-        if(body.content.postback){ 
-            let pbCountList = body.content.postback.split(",");
-            console.log(pbCountList);
-                for(let xi of pbCountList){
+        switch (body.type) {
+            case "message":
+                if (body.content.postback) {
+                    if(body.content.postback==="start"){body.content.postback="C00-F10000";}
+                    let pbCountList = body.content.postback.split(",");
+                    for (let xi of pbCountList) {
+                        retArray.push(
+                            makeAnswerJson(headers["x-works-botid"], body, findCurrCont(xi.trim(), contentInstList))
+                        )
+                    }
+                    resolve(retArray)
+                    // 컨텐츠 갯수 검사 
+                    //Ident 검사
+                    // 컨텐츠 전송 ( 간격 조정)
+                }
+                //단순 텍스트 입력인 경우 
+                else if (body.content.type === "text") {
+                    let botInst = isVaildBot(headers["x-works-botid"]);
+                    if (botInst) {
+                        if(body.content.text.charCodeAt(0)===35){
+                            retArray.push(makeAnswerJson(headers["x-works-botid"],body,hashSearch(body.content.text.slice(1).toUpperCase())))
+                            resolve(retArray)
+                        }
+
+                        else {
+                            for (let ti of botInst.botRevTxtList)
+                                if (ti.TXT_INP_TXT === body.content.text) {
+                                    let txtpbCountList = ti.TXT_CONT_CD.split(",");
+                                    for (let zi of txtpbCountList) {
+                                        retArray.push(
+                                            makeAnswerJson(headers["x-works-botid"], body, findCurrCont(zi, contentInstList))
+                                        );
+                                    }
+                                    resolve(retArray)
+                                }
+                        }
+
+                        
+
+                    }
+                    // 디폴트 
+
+
+                }
+                break;
+            case "postback":
+                let pbCountList = body.data.split(",");
+                console.log(pbCountList);
+                for (let xi of pbCountList) {
                     retArray.push(
-                    makeAnswerJson(headers["x-works-botid"],body,findCurrCont(xi.trim(),contentInstList))
+                        makeAnswerJson(headers["x-works-botid"], body, findCurrCont(xi.trim(), contentInstList))
                     )
                 }
                 resolve(retArray)
-                // 컨텐츠 갯수 검사 
-                //Ident 검사
-                // 컨텐츠 전송 ( 간격 조정)
-        } 
-        //단순 텍스트 입력인 경우 
-        else if(body.content.type==="text") {
+                
+                break;
 
-            let botInst = isVaildBot(headers["x-works-botid"]);
-            if(botInst){
-                for (let ti of botInst.botRevTxtList)
-                    if(ti.TXT_INP_TXT===body.content.text){
-                        let txtpbCountList = ti.TXT_CONT_CD.split(",");
-                        for(let zi of txtpbCountList){
-                            retArray.push(
-                                makeAnswerJson(headers["x-works-botid"],body,findCurrCont(zi,contentInstList))
-                                );
-                            }
-                        resolve(retArray)
-                }
-            }
-            // # 검색 확인
-
-            
-            // 아닐경우 (자연어)
-
-
-            // 디폴트 
-
-            
+            default:
+                resolve([0]);
+                break;
         }
 
-    }).catch(error => { 
-        console.log(error); 
+
+
+    }).catch(error => {
+        console.log(error);
     });
 }
 
@@ -187,40 +228,44 @@ let findCurrCont = function (postback, conList) {
     }
 };
 
-let hashSearch = function (inputText, botCode) {
-    console.log(inputText);
+let hashSearch = function (inputText) {
     let arrayCount = 0;
-    let outArray = [];
+    let retobj = {
+        contType:"carousel",
+        outArray:[]
+    }
 
-    for (let hs of masterData.contentList) {
-        if (hs.CONT_BOT_CD === botCode) {
-            if (hs.CONT_KWD && hs.CONT_KWD.indexOf(inputText) != -1) {
-                if (arrayCount >= 10) {
+    for (let hs of actionInstList) {
+        if (hs.actkeyWord && (hs.actSetCode.slice(0,3)==="S00") && hs.actkeyWord.indexOf(inputText) != -1) {
+            if (arrayCount >= 10) {
                     break;
                 }
-
                 arrayCount++;
-                outArray.push(
+                retobj.outArray.push(
                     {
-                        "title": hs.CONT_TXT,
-                        "text": hs.CONT_TXT,
+                        "title": hs.actName,
+                        "text": hs.actName,
                         "defaultAction": {
                             "type": "postback",
                             "label": "자세히 보기",
-                            "data": hs.CONT_CD
+                            "data": hs.nextContCode
                         },
                         "actions": [{
                             "type": "postback",
                             "label": "자세히 보기",
-                            "data": hs.CONT_CD
+                            "data": hs.nextContCode
                         }]
                     }
                 )
             }
-        }
     }
 
-    return outArray;
+    if(arrayCount===0){
+        retobj = { contType:"text",
+                    contText:"검색결과가 없습니다"
+                                };
+    }
+    return retobj;
 
 };
 
@@ -229,24 +274,26 @@ let createlogfile = function () {
     return yourDate.toISOString().split('T')[0]
 };
 
-let logStream = function (value) {
+let log2csv = function (inpString) {
+    console.log(inpString)
+    console.log(type(inpString))
 
-    mystring = path.join(__dirname, "log", `${createlogfile()}.txt`);
+
+    mystring = path.join(__dirname, "log", `${createlogfile()}.csv`);
     if (fs.existsSync(mystring)) {
-        var logStream = fs.createWriteStream(mystring, { flags: 'a' });
+        var logStream = fs.createWriteStream(mystring, { flags: 'a', encoding :'utf-8'});
         // use {flags: 'a'} to append and {flags: 'w'} to erase and write a new file
-        logStream.write(JSON.stringify(value));
+        logStream.write(inpString);
         logStream.end("\n");
     }
     else {
         var logStream = fs.createWriteStream(mystring, { flags: 'w' });
         // use {flags: 'a'} to append and {flags: 'w'} to erase and write a new file
-        logStream.write(JSON.stringify(value));
+        logStream.write(inpString);
         logStream.end("\n");
     }
 
 };
-
 
 let makeActionJson = function (actionSetData) {
     let retArray = [];
@@ -261,32 +308,6 @@ let makeActionJson = function (actionSetData) {
     return retArray;
 };
 
-let readObjectinfo = function (readObject) {
-    //date
-    dataToSend = ""
-    var bash = spawn('sh', ['upload_object.sh']);
-    bash.stdout.on('data', function (data) {
-        console.log("Pipe data from bash script");
-        dataToSend = data.toString();
-        console.log(dataToSend);
-    });
-    //write
-    bash.on('close', (code) => {
-        console.log(code);
-        var d = new Date();
-        let curtime = d.getFullYear() + "-" + ("00" + (d.getMonth() + 1)).slice(-2) + "-" + ("00" + d.getDate()).slice(-2) + " " + ("00" + d.getHours()).slice(-2) + ":" + ("00" + d.getMinutes()).slice(-2) + ":" + ("00" + d.getSeconds()).slice(-2)
-        console.log(curtime);
-
-        fs.readFile('pdf_url', (err, data) => {
-            if (err) throw err;
-            console.log(data.toString());
-
-            if (data.toString().match("x-works-resource-id")) {
-            }
-        });
-    });
-}
-
 
 const initialize = async function () {
     let res = {};
@@ -295,14 +316,14 @@ const initialize = async function () {
     res.tokenTime = new Date();
     await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
     // 이후 book.txt 리드
-    const fileRes = await fs.readFileSync('books.txt',{encoding:'utf8', flag:'r'});
+    const fileRes = await fs.readFileSync('books.txt', { encoding: 'utf8', flag: 'r' });
     const axOptions = JSON.parse(fileRes);
 
-    if(axOptions.access_token){
-        baseHeaders.Authorization +=axOptions.access_token
+    if (axOptions.access_token) {
+        baseHeaders.Authorization += axOptions.access_token
         console.log(baseHeaders);
     }
-    
+
     dbconn.readMasterTable(options.dbpool).then(function (data) {
         masterData.chatBotList = data[0].slice(0, data[0].length);
         masterData.contentList = data[1].slice(0, data[1].length);
@@ -351,14 +372,14 @@ const initialize = async function () {
 
 const wraper = asyncFn => {
     // FIXME: Promise와 catch를 이용하면 더 간결해질 것 같습니다.
-      return (async (req, res, next) => {
+    return (async (req, res, next) => {
         try {
-          return await asyncFn(req, res, next)
+            return await asyncFn(req, res, next)
         } catch (error) {
-          return next(error)
+            return next(error)
         }
-      })  
-    }
+    })
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -374,9 +395,9 @@ app.post("*", wraper(async (req, res, next) => {
     const { headers, method, url } = req;
     //    console.log(Object.keys(req));
     console.log(`\n== check post method: ${method}, url :${url} ==`);
-    if(isVaildBot(headers["x-works-botid"])){
+    if (isVaildBot(headers["x-works-botid"])) {
         next();
-    } 
+    }
     else {
         console.log("it's not a vaild bot");
         //필요하다면 meesage Text 로 현재 응답할 수 있는 상태가 아니다
@@ -384,44 +405,41 @@ app.post("*", wraper(async (req, res, next) => {
     }
 }));
 
-
 //await new Promise(r => setTimeout(r, 5000 * Math.random()));
 app.post("/fexu", wraper(async (req, res, next) => {
-    // 로깅 시작
+
     // answerObj = [obj1, obj2, obj3, obj4];
+    log2csv(await converter.json2csvAsync([{body:req.body, header : req.headers}]));
     let answerObj = await vaildateMessage(req);
     console.log("=====answerobj : ");
     console.log(answerObj);
     let retMsg = await responseBotMsg(answerObj);
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
-        
-  }));
 
+}));
 
 app.get("/botImgFile/*", function (req, res) {
 
-    try{
-    console.log("botImgfile")
-    const { headers, method, url } = req;
-    console.log("haha");
-    console.log(url);
-    res.sendFile(path.join(__dirname, url.replace(";", "")));
-    } catch(err){
+    try {
+        console.log("botImgfile")
+        const { headers, method, url } = req;
+        console.log("haha");
+        console.log(url);
+        res.sendFile(path.join(__dirname, url.replace(";", "")));
+    } catch (err) {
         console.log("img get error");
     }
 });
 
+// 1.입력 데이터에 대한 로깅 
+// (1)"안녕" 이라고 텍스트 입력
+// (2)"#입력값" 이라고 검색 텍스트 입력 
+// (3) 리치메뉴를 통한 입력
+// (4) 버튼 템플릿으로 postback을 받은 경우
+// (5) 
 
-
-    // 1.입력 데이터에 대한 로깅 
-        // (1)"안녕" 이라고 텍스트 입력
-        // (2)"#입력값" 이라고 검색 텍스트 입력 
-        // (3) 리치메뉴를 통한 입력
-        // (4) 버튼 템플릿으로 postback을 받은 경우
-        // (5) 
-
-    // 응답 데이터 작성 부 
+// 응답 데이터 작성 부 
 
 app.post("/test", function (req, res) {
     //    console.log(Object.keys(req));
@@ -429,8 +447,8 @@ app.post("/test", function (req, res) {
     res.end()
 });
 
-initialize().then(()=>{
-    https.createServer(options, app).listen(80);
+initialize().then(() => {
+    http.createServer(options, app).listen(80);
     https.createServer(options, app).listen(443);
 }
 )

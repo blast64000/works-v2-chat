@@ -36,6 +36,7 @@ let ActNode = class {
         this.actName = data.ACT_NM;
         this.nextContCode = data.ACT_CONT_CD;
         this.actIdentCode = data.ACT_IDENT_CD;
+        this.actkeyWord = data.ACT_KWD;
         this.nextNode = null;
     }
     

@@ -74,74 +74,70 @@ payload["modifyBotUser_Delete"] = {};
 
 payload["addRichMenu_Post"] = {
 
-  "richmenuName": "펙수 메인 리치메뉴",
+  "richmenuName": "펙수 메인 리치메뉴_v1",
   "areas": [
     //1.메인화면
     {
       "action": {
-        "type": "message",
+        "type": "postback",
         "label": "메인 화면",
         "displayText": "메인 화면",
-        "data":"test",
-        "postback":"c100-70010"
+        "data":"C00-F10000",
       },
       "bounds": {
         "x": 0,
         "y": 0,
         "width": 1250,
-        "height": 843
+        "height": 421
       }
     },
     //2.펙수클루 제품개요
     {
       "action": {
-        "type": "message",
+        "type": "postback",
         "label": "제품 개요",
         "displayText": "제품 개요",
-        "data":"test",
-        "postback":"c100-70011"
+        "data":"C00-F90001,C00-F90002",
       },
       "bounds": {
         "x": 1250,
         "y": 0,
         "width": 1250,
-        "height": 843
+        "height": 421
       }
     },//3.파이프라인
     {
       "action": {
-        "type": "message",
+        "type": "postback",
         "label": "파이프라인",
         "displayText": "파이프라인",
-        "data":"test",
-        "postback":"c100-70012"
+        "data":"C00-F90003",
       },
       "bounds": {
         "x": 0,
-        "y": 843,
+        "y": 421,
         "width": 1250,
-        "height": 843
+        "height": 422
       }
     },//4.성공모델
     {
       "action": {
-        "type": "message",
-        "label": "성공모델",
-        "displayText": "성공모델",
-        "data":"test",
-        "postback":"c100-70013"
+        "type": "postback",
+        "label": "주요 판촉자료",
+        "displayText": "주요 판촉자료",
+        "data":"C00-F90004,C00-F90005,C00-F90006",
       },
       "bounds": {
         "x": 1250,
-        "y": 843,
+        "y": 421,
         "width": 1250,
-        "height": 843
+        "height": 422
       }
     }
   ],
   "size": {
     "width": 2500,
-    "height": 1686
+    "height": 843
   }
 
 };
@@ -155,7 +151,7 @@ payload["appendRichMenuImage_Get"] = {
 };
 
 payload["appendRichMenuImage_Post"] = {
-    "fileId": "kr1.1656986095073811450.1657072495.1.3873810.0.0.0"
+    "fileId": "kr1.1657777541597561865.1657863941.1.3904290.0.0.0"
 };
 
 
