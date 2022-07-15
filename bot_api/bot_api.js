@@ -2,7 +2,7 @@
 const qs = require("qs");
 const fs = require("fs");
 const axios = require("axios");
-const pay = require("./payload.js");
+let pay = require("./payload.js");
 const FormData = require('form-data');
 const request = require('request');
 
@@ -21,10 +21,11 @@ const sendDirectMsg = async function(msg,userId){
     baseURL: 'https://www.worksapis.com/v1.0/bots/',
     headers: baseHeaders,
     timeout: 3000});
-      apiFunc = await reqConfig2.post(`3904290/users/${userId}/messages`, {content:{type:"text",text:msg
-      }});
+      apiFunc = await reqConfig2.post(`3904290/users/${userId}/messages`, pay["init_force"]);
   }
 
+
+  
 
 const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
@@ -36,11 +37,14 @@ const Main = async function (){
       headers: baseHeaders,
       timeout: 3000});
 
-      sendDirectMsg("안녕하세요 펙수클루 챗봇입니다","bmkim@daewoong.co.kr");
+
+    //modifyBot("GET","3904290")
+    //modifyBotUser("GET","3904290","21342","jyyoon426@daewoong.co.kr");
+    modifyBotUser("POST","3904290","21342","changwolf@daewoong.co.kr");
+    sendDirectMsg("","changwolf@daewoong.co.kr");
 
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
-    //modifyBot("GET","3904290")
-    //modifyBotUser("GET","3904290","21342");
+    
     //get_users_email("test01@hbcookie.com")
     //addBot("GET");
 
@@ -331,17 +335,12 @@ let modifyBotUser = async function (rest, botId, domainId,userId) {
   try {
     switch (rest) {
       case "POST":
+        pay.modifyBotUser_Post.userId=userId;
         apiFunc = await reqConfig.post(path, pay.modifyBotUser_Post);
         break;
       case "GET":
         apiFunc = await reqConfig.get(path, pay.modifyBotUser_Get);
         
-        if(apiFunc.members.length>0){
-
-          for( let xi of apiFunc.members){
-            get_users_email(xi);
-          }
-        }
 
         break;
       case "DELETE":

@@ -17,19 +17,12 @@ const lklist = require("./ln-list.js");
 const { type } = require("os");
 const { text } = require("express");
 
-
-
-
-
-
 const app = express()
 
 let baseHeaders = {
     'Authorization': "Bearer ",
     "Content-Type": `application/json`
 };
-
-
 
 
 let masterData = {
@@ -75,6 +68,7 @@ let makeAnswerJson = function (botId, reqbody, contObj) {
             retObj.json.content.text = contObj.contText;
             return retObj;
             break;
+
         case "image":
             retObj.json.content.type = contObj.contType;
             retObj.json.content.previewImageUrl = contObj.contPreImg;
@@ -103,8 +97,6 @@ let makeAnswerJson = function (botId, reqbody, contObj) {
             retObj.json.content.columns = contObj.outArray;
             return retObj;
             break;
-
-        
 
         default:
             return {};
