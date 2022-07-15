@@ -14,6 +14,18 @@ let baseHeaders={
     "Content-Type": `application/json`
 };
 
+
+const sendDirectMsg = async function(msg,userId){
+
+  reqConfig2 = axios.create({
+    baseURL: 'https://www.worksapis.com/v1.0/bots/',
+    headers: baseHeaders,
+    timeout: 3000});
+      apiFunc = await reqConfig2.post(`3904290/users/${userId}/messages`, {content:{type:"text",text:msg
+      }});
+  }
+
+
 const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
     if(err) throw err;
@@ -24,9 +36,11 @@ const Main = async function (){
       headers: baseHeaders,
       timeout: 3000});
 
-    modifyBot("PATCH","3904290",{"defaultRichmenuId":"144526"})
-    //modifyBotUser("GET","3873810","210997");
-    //modifyBot("GET","3873810")
+      sendDirectMsg("안녕하세요 펙수클루 챗봇입니다","bmkim@daewoong.co.kr");
+
+    //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
+    //modifyBot("GET","3904290")
+    //modifyBotUser("GET","3904290","21342");
     //get_users_email("test01@hbcookie.com")
     //addBot("GET");
 
@@ -321,6 +335,14 @@ let modifyBotUser = async function (rest, botId, domainId,userId) {
         break;
       case "GET":
         apiFunc = await reqConfig.get(path, pay.modifyBotUser_Get);
+        
+        if(apiFunc.members.length>0){
+
+          for( let xi of apiFunc.members){
+            get_users_email(xi);
+          }
+        }
+
         break;
       case "DELETE":
         apiFunc = await reqConfig.delete(path + `/${userId}`, pay.modifyBotUser_Delete);

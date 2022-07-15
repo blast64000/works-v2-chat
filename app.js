@@ -70,7 +70,7 @@ let makeAnswerJson = function (botId, reqbody, contObj) {
 
     switch (contObj.contType) {
         case "text":
-            if(contObj.contText===""){return  0};
+            if (contObj.contText === "") { return 0 };
             retObj.json.content.type = contObj.contType;
             retObj.json.content.text = contObj.contText;
             return retObj;
@@ -98,11 +98,13 @@ let makeAnswerJson = function (botId, reqbody, contObj) {
 
         case "carousel":
             console.log(contObj);
-            if(!contObj.outArray){return  0};
+            if (!contObj.outArray) { return 0 };
             retObj.json.content.type = contObj.contType;
             retObj.json.content.columns = contObj.outArray;
             return retObj;
             break;
+
+        
 
         default:
             return {};
@@ -128,7 +130,7 @@ let responseBotMsg = async function (obj) {
         endTime = new Date().getTime();
         console.log(endTime - startTime);
         await new Promise(resolve => setTimeout(resolve,
-            (endTime - startTime) > 0 ? (1000-(endTime - startTime)) : 10));
+            (endTime - startTime) > 0 ? (1000 - (endTime - startTime)) : 10));
     }
 };
 
@@ -139,7 +141,7 @@ const vaildateMessage = function (req) {
         switch (body.type) {
             case "message":
                 if (body.content.postback) {
-                    if(body.content.postback==="start"){body.content.postback="C00-F10000";}
+                    if (body.content.postback === "start") { body.content.postback = "C00-F10000"; }
                     let pbCountList = body.content.postback.split(",");
                     for (let xi of pbCountList) {
                         retArray.push(
@@ -155,13 +157,13 @@ const vaildateMessage = function (req) {
                 else if (body.content.type === "text") {
                     let botInst = isVaildBot(headers["x-works-botid"]);
                     if (botInst) {
-                        if(body.content.text.charCodeAt(0)===35){
-                            retArray.push(makeAnswerJson(headers["x-works-botid"],body,hashSearch(body.content.text.slice(1).toUpperCase())))
+                        if (body.content.text.charCodeAt(0) === 35) {
+                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, hashSearch(body.content.text.slice(1).toUpperCase())))
                             resolve(retArray)
                         }
 
                         else {
-                            for (let ti of botInst.botRevTxtList)
+                            for (let ti of botInst.botRevTxtList) {
                                 if (ti.TXT_INP_TXT === body.content.text) {
                                     let txtpbCountList = ti.TXT_CONT_CD.split(",");
                                     for (let zi of txtpbCountList) {
@@ -171,9 +173,20 @@ const vaildateMessage = function (req) {
                                     }
                                     resolve(retArray)
                                 }
+
+
+                            }
+
+                            if(retArray.length===0){
+                                if(body.content.text==="주요 판촉자료"){break;}
+                                if(body.content.text==="메인 화면"){break;}
+                            retArray.push(makeAnswerJson(headers["x-works-botid"], body,{contType:"text",contText:"필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #식사) \n 메인화면으로 돌아갑니다."} ))
+                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont("C00-F10000", contentInstList)))
+                            resolve(retArray);
+                            }
                         }
 
-                        
+
 
                     }
                     // 디폴트 
@@ -190,7 +203,7 @@ const vaildateMessage = function (req) {
                     )
                 }
                 resolve(retArray)
-                
+
                 break;
 
             default:
@@ -231,39 +244,40 @@ let findCurrCont = function (postback, conList) {
 let hashSearch = function (inputText) {
     let arrayCount = 0;
     let retobj = {
-        contType:"carousel",
-        outArray:[]
+        contType: "carousel",
+        outArray: []
     }
 
     for (let hs of actionInstList) {
-        if (hs.actkeyWord && (hs.actSetCode.slice(0,3)==="S00") && hs.actkeyWord.indexOf(inputText) != -1) {
+        if (hs.actkeyWord && (hs.actSetCode.slice(0, 3) === "S00") && hs.actkeyWord.indexOf(inputText) != -1) {
             if (arrayCount >= 10) {
-                    break;
-                }
-                arrayCount++;
-                retobj.outArray.push(
-                    {
-                        "title": hs.actName,
-                        "text": hs.actName,
-                        "defaultAction": {
-                            "type": "postback",
-                            "label": "자세히 보기",
-                            "data": hs.nextContCode
-                        },
-                        "actions": [{
-                            "type": "postback",
-                            "label": "자세히 보기",
-                            "data": hs.nextContCode
-                        }]
-                    }
-                )
+                break;
             }
+            arrayCount++;
+            retobj.outArray.push(
+                {
+                    "title": hs.actName,
+                    "text": hs.actName,
+                    "defaultAction": {
+                        "type": "postback",
+                        "label": "자세히 보기",
+                        "data": hs.nextContCode
+                    },
+                    "actions": [{
+                        "type": "postback",
+                        "label": "자세히 보기",
+                        "data": hs.nextContCode
+                    }]
+                }
+            )
+        }
     }
 
-    if(arrayCount===0){
-        retobj = { contType:"text",
-                    contText:"검색결과가 없습니다"
-                                };
+    if (arrayCount === 0) {
+        retobj = {
+            contType: "text",
+            contText: "검색결과가 없습니다"
+        };
     }
     return retobj;
 
@@ -281,7 +295,7 @@ let log2csv = function (inpString) {
 
     mystring = path.join(__dirname, "log", `${createlogfile()}.csv`);
     if (fs.existsSync(mystring)) {
-        var logStream = fs.createWriteStream(mystring, { flags: 'a', encoding :'utf-8'});
+        var logStream = fs.createWriteStream(mystring, { flags: 'a', encoding: 'utf-8' });
         // use {flags: 'a'} to append and {flags: 'w'} to erase and write a new file
         logStream.write(inpString);
         logStream.end("\n");
@@ -409,7 +423,7 @@ app.post("*", wraper(async (req, res, next) => {
 app.post("/fexu", wraper(async (req, res, next) => {
 
     // answerObj = [obj1, obj2, obj3, obj4];
-    log2csv(await converter.json2csvAsync([{body:req.body, header : req.headers}]));
+    log2csv(await converter.json2csvAsync([{ body: req.body, header: req.headers }]));
     let answerObj = await vaildateMessage(req);
     console.log("=====answerobj : ");
     console.log(answerObj);
