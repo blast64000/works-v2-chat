@@ -6,7 +6,6 @@ const path = require("path")
 const http = require('http')
 const https = require('https')
 
-
 const converter = require('json-2-csv');
 const express = require("express")
 const bodyParser = require("body-parser")
@@ -41,15 +40,9 @@ let saleInstList = [];
 
 
 let makeAnswerJson = function (botId, reqbody, contObj) {
-
     if (!contObj) {
         return 0;
     }
-
-    console.log("===reqbody");
-    console.log(reqbody);
-    console.log("===contObj");
-    console.log(contObj);
 
     let retObj = {
         botId: botId,
@@ -102,7 +95,6 @@ let makeAnswerJson = function (botId, reqbody, contObj) {
             return {};
     }
 };
-
 
 let responseBotMsg = async function (obj) {
     let reqConfig = axios.create({
@@ -275,27 +267,71 @@ let hashSearch = function (inputText) {
 
 };
 
-let createlogfile = function () {
+let json2Text = function(headers,body){
+
+    return new Promise((resolve, reject) => {
+    let retString = "";
+    if(headers["x-works-botid"]){
+        retString+=`${headers["x-works-botid"]}, `;
+    }
+
+    if(body.type){
+        let newDate = new Date(body.issuedTime);
+        newDate.setHours(newDate.getHours()+9);
+        retString+=`${newDate.toISOString()}, ${body.type}, `
+    }  
+
+    if(body.source){
+        retString+=`${body.source.userId}, ${body.source.domainId}, `
+    }
+
+    if(body.content){
+        retString+=`${body.content.type}, ${body.content.text}, `
+
+        if(body.content.postback){
+            retString+=`${body.content.postback}`
+        } else { 
+            retString+=` `
+        }
+
+
+    }else{
+        retString+=` , , `
+    }
+
+
+
+    if(retString===""){
+        reject("");
+    }else { 
+        console.log(retString);
+        resolve(retString);
+    }
+
+});
+}
+
+let makeLogName = function () {
     let yourDate = new Date()
+    yourDate.setHours(yourDate.getHours()+9);
     return yourDate.toISOString().split('T')[0]
 };
 
 let log2csv = function (inpString) {
-    console.log(inpString)
-    console.log(type(inpString))
 
+    mystring = path.join(__dirname, "log", `${makeLogName()}.csv`);
 
-    mystring = path.join(__dirname, "log", `${createlogfile()}.csv`);
     if (fs.existsSync(mystring)) {
-        var logStream = fs.createWriteStream(mystring, { flags: 'a', encoding: 'utf-8' });
+        let logStream = fs.createWriteStream(mystring, { flags: 'a', encoding: 'utf-8' });
         // use {flags: 'a'} to append and {flags: 'w'} to erase and write a new file
         logStream.write(inpString);
         logStream.end("\n");
     }
     else {
-        var logStream = fs.createWriteStream(mystring, { flags: 'w' });
+        let header = "botId, time, msgtype, userId, domainId, contType, text, postback";
+        let logStream = fs.createWriteStream(mystring, { flags: 'w' });
         // use {flags: 'a'} to append and {flags: 'w'} to erase and write a new file
-        logStream.write(inpString);
+        logStream.write(`\ufeff${header}\n${inpString}`);
         logStream.end("\n");
     }
 
@@ -411,15 +447,22 @@ app.post("*", wraper(async (req, res, next) => {
     }
 }));
 
-//await new Promise(r => setTimeout(r, 5000 * Math.random()));
 app.post("/fexu", wraper(async (req, res, next) => {
 
-    // answerObj = [obj1, obj2, obj3, obj4];
-    log2csv(await converter.json2csvAsync([{ body: req.body, header: req.headers }]));
+    const { headers, body } = req;
+    console.log(headers);
+    console.log(body);
+
     let answerObj = await vaildateMessage(req);
     console.log("=====answerobj : ");
     console.log(answerObj);
     let retMsg = await responseBotMsg(answerObj);
+
+    logreturn = await json2Text(headers,body);
+    if(logreturn){
+        log2csv(logreturn);
+    }
+
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
 

@@ -24,9 +24,6 @@ const sendDirectMsg = async function(msg,userId){
       apiFunc = await reqConfig2.post(`3904290/users/${userId}/messages`, pay["init_force"]);
   }
 
-
-  
-
 const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
     if(err) throw err;

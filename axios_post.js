@@ -5,14 +5,12 @@ const fs = require("fs");
 const axios = require("axios");
 const options = require("./options.js")
 
-
-
 module.exports.getJWT = function(){
   return new Promise(function(resolve,reject){
 
 
     
-      let privateKey = fs.readFileSync('./config/private_20220622084023.key');
+      let privateKey = fs.readFileSync(`./config/${options.privKey}`);
       let nowDateSecond = Math.floor(Date.now() / 1000);
       let expDateSecond = Math.floor(Date.now() / 1000) + 60
       
