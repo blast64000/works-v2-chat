@@ -7,8 +7,6 @@ const options = require("./options.js")
 
 module.exports.getJWT = function(){
   return new Promise(function(resolve,reject){
-
-
     
       let privateKey = fs.readFileSync(`./config/${options.privKey}`);
       let nowDateSecond = Math.floor(Date.now() / 1000);

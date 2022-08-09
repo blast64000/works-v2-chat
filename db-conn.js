@@ -59,5 +59,4 @@ exports.readMasterTable = async function(poolConfig) {
             conn.end()
         };
     }
-
 }

@@ -33,22 +33,15 @@ const Main = async function () {
             headers: baseHeaders,
             timeout: 3000
         });
-
         let newDate = new Date();
         newDate.setHours(newDate.getHours()+9);
-
         let dateString =newDate.toISOString().split('T')[0]
         fs.readFile(`../log/${dateString}.csv`,{encoding:"utf8"}, (csvErr, data) => {
             if (csvErr) throw csvErr;
-
             makeWriteNote(data).then( (res) =>{
                 console.log(res);
             })
-
-
         })
-
-
     })
 
 }

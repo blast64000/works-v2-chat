@@ -1,5 +1,333 @@
 let payload = {};
 
+payload["refresh"]={
+  "content": {
+    "type": "text",
+    "text": "token is refreshed"
+  }
+}
+
+
+payload["flex"] = 
+{ 
+  "content":{
+    "type": "flex",
+    "altText": "this is a flexible template",
+    "contents": {
+      "type": "carousel",
+      "contents": [
+        {
+          "type": "bubble",
+          "size": "kilo",
+          "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Today",
+                "size": "xl",
+                "weight": "bold",
+                "color": "#ffffff"
+              }
+            ],
+            "backgroundColor": "#0AACF7"
+          },
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/rtfW312/todo-check.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Weekly Meeting",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#767676"
+                  },
+                  {
+                    "type": "text",
+                    "text": "10:00 AM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "none"
+              },
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/rtfW312/todo-check.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Lunch",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#767676"
+                  },
+                  {
+                    "type": "text",
+                    "text": "12:00 PM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/rtfW312/todo-check.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Budget Review",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#767676"
+                  },
+                  {
+                    "type": "text",
+                    "text": "3:00 PM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/rtfW312/todo-check.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Conference Call",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#767676"
+                  },
+                  {
+                    "type": "text",
+                    "text": "4:30 PM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/TYZM8gT/todo-uncheck.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Dinner",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#0AACF7",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "text",
+                    "text": "7:00 PM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "lg"
+              }
+            ],
+            "paddingBottom": "15px",
+            "margin": "none",
+            "paddingTop": "15px"
+          }
+        },
+        {
+          "type": "bubble",
+          "size": "kilo",
+          "header": {
+            "type": "box",
+            "layout": "vertical",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Tomorrow",
+                "wrap": true,
+                "weight": "bold",
+                "size": "xl",
+                "color": "#ffffff"
+              }
+            ],
+            "backgroundColor": "#FF6B6E"
+          },
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/rtfW312/todo-check.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Budget Wrap-up",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#767676"
+                  },
+                  {
+                    "type": "text",
+                    "text": "9:00 AM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "none"
+              },
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/TYZM8gT/todo-uncheck.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Lunch Meeting",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#FF6B6E",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "text",
+                    "text": "12:00 PM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "icon",
+                    "url": "https://i.ibb.co/TYZM8gT/todo-uncheck.png",
+                    "size": "lg",
+                    "offsetTop": "4px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Orientation",
+                    "margin": "lg",
+                    "gravity": "center",
+                    "flex": 2,
+                    "color": "#FF6B6E",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2:00 PM",
+                    "weight": "regular",
+                    "gravity": "center",
+                    "align": "end",
+                    "flex": 1,
+                    "size": "sm",
+                    "color": "#999999"
+                  }
+                ],
+                "margin": "lg"
+              }
+            ],
+            "paddingTop": "15px",
+            "paddingBottom": "15px"
+          }
+        }
+      ]
+    }
+}
+
+}
+
 payload["init_force"] = { 
 
     "content": {
@@ -11,6 +339,57 @@ payload["init_force"] = {
         "postback": "C00-F10000"
       }]
     }
+}
+
+
+payload["directMsg"] = { 
+
+  "content": {
+    "type": "text",
+    "text": "Please select your favorite food category!",
+    "quickReply": {
+      "items": [
+        {
+//          "imageUrl": "https://www.example.com/a.png",
+          "action": {
+            "type": "message",
+            "label": "sushi",
+            "text": "Sushi"
+          }
+        },
+        {
+//          "imageUrl": "https://www.example.com/b.png",
+          "action": {
+            "type": "message",
+            "label": "Italian",
+            "text": "Italian"
+          }
+        },
+        {
+          "action": {
+            "type": "camera",
+            "label": "Open Camera"
+          }
+        },
+        {
+          "action": {
+            "type": "uri",
+            "label": "uri",
+            "uri":"https://naver.com"
+          }
+        },
+        {
+          "action": {
+            "type": "location",
+            "label": "Location"
+          }
+        }
+
+
+
+      ]
+    }
+  }
 }
 
 

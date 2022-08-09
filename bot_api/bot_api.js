@@ -7,21 +7,19 @@ const FormData = require('form-data');
 const request = require('request');
 
 
-
-
 let baseHeaders={
   'Authorization': "Bearer ",
     "Content-Type": `application/json`
 };
 
 
-const sendDirectMsg = async function(msg,userId){
+const sendDirectMsg = async function(msg,userId,isInit){
 
   reqConfig2 = axios.create({
     baseURL: 'https://www.worksapis.com/v1.0/bots/',
     headers: baseHeaders,
     timeout: 3000});
-      apiFunc = await reqConfig2.post(`3904290/users/${userId}/messages`, pay["init_force"]);
+      apiFunc = await reqConfig2.post(`3873810/users/${userId}/messages`, (isInit? pay["init_force"]:pay["flex"]));
   }
 
 const Main = async function (){
@@ -37,8 +35,8 @@ const Main = async function (){
 
     //modifyBot("GET","3904290")
     //modifyBotUser("GET","3904290","21342","jyyoon426@daewoong.co.kr");
-    modifyBotUser("POST","3904290","21342","changwolf@daewoong.co.kr");
-    sendDirectMsg("","changwolf@daewoong.co.kr");
+    //modifyBotUser("POST","3904290","21342","changwolf@daewoong.co.kr");
+    sendDirectMsg("하하하하","blast64000@hbcookie.com",0);
 
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
     
