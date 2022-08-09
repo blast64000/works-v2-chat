@@ -6,20 +6,47 @@ let pay = require("./payload.js");
 const fsPromises = fs.promises;
 
 
-console.log(options.clisecret);
-
 const refreshCode = async function(){
-
-    reqConfig2 = axios.create({
+  try{
+    let thisReqConfig = axios.create({
       headers: { "x-works-botid":options.botNo },
-      baseURL: 'https://hbcookie.com/',
-      timeout: 3000});
-        apiFunc = await reqConfig2.post(`refresh`, {clisecret:options.clisecret});
+      baseURL: options.thisUrl,
+      timeout: 3000
+    });
+
+
+
+    apiFunc = await thisReqConfig.post(`refresh`, {clisecret:options.clisecret});
+
+    if(apiFunc.status===200){
+      const fileRes = await fs.readFileSync('../books.txt', { encoding: 'utf8', flag: 'r' });
+
+      let msgReqConfig = axios.create({
+        headers: {"Content-Type": `application/json`, 'Authorization': `Bearer ${JSON.parse(fileRes).access_token}`},
+        baseURL: 'https://www.worksapis.com/v1.0/bots/',
+        timeout: 3000})
+
+        await msgReqConfig.post(`${options.botNo}/users/${options.userId}/messages`,pay["refresh"]);      
+    }
+
+    
+  }catch(err){
+    console.log(err.message);
+    console.log(err.name);
+    console.log(err.code);
+    console.log(err.config);
+    
+  }
+    
+/* 
+        
         if(apiFunc.data==="refresh value"){
-          msgret = await reqConfig2.post(`${options.clisecret}/users/${options.userId}/messages`, 
+          
           
           );
         }
+
+        */
     }
 
 
