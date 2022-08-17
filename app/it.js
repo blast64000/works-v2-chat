@@ -3,7 +3,6 @@ const axios = require("axios");
 const path = require("path");
 
 
-
 let isVaildBot = function (worksBotNo, botInstList) {
     for (bi of botInstList) {
         if (bi.botWorksCode === worksBotNo) {
@@ -16,8 +15,8 @@ let isVaildBot = function (worksBotNo, botInstList) {
 
 let findCurrCont = function (postback, conList) {
     x = undefined;
-    x = conList.find(o => o.contCode === postback);
 
+    x = conList.find(o => o.contCode === postback);
     if (x == undefined) {
         return undefined;
     } else {
@@ -25,11 +24,12 @@ let findCurrCont = function (postback, conList) {
     }
 };
 
-let makeAnswerJson = function (botId, reqbody, contObj) {
-    if (!contObj) {return 0;}
-    
+let makeAnswerJson = function (worksBotId, reqbody, contObj) {
+
+    if(!contObj) {return 0}
+
     let retObj = {
-        botId: botId,
+        botId: worksBotId,
         userId: reqbody.source.userId,
 
         json: {
@@ -80,20 +80,15 @@ let makeAnswerJson = function (botId, reqbody, contObj) {
     }
 };
 
-
-let hashSearch = function (inputText, actionInstList) {
+let hashSearch = function (inputText, actionInstList,botInst) {
     let arrayCount = 0;
     let retobj = {
         contType: "carousel",
         outArray: []
     }
-
+    
     for (let hs of actionInstList) {
-        if(hs.actkeyWord){
-        console.log(hs.actkeyWord.replace(/ /g, ''));
-        }
-
-        if (hs.actkeyWord && (hs.actSetCode.slice(0, 3) === "S00") && hs.actkeyWord.replace(/ /g, '').indexOf(inputText) != -1) {
+        if (hs.actkeyWord && (hs.actSetCode.slice(0, 5) === botInst.botStartNode.contCode.slice(0,5)) && hs.actkeyWord.replace(/ /g, '').indexOf(inputText) != -1) {
             if (arrayCount >= 10) {
                 break;
             }
@@ -129,12 +124,24 @@ let hashSearch = function (inputText, actionInstList) {
 
 const vaildateMessage = function (req, contentInstList,botInstList,actionInstList) {
     return new Promise((resolve, reject) => {
+
         retArray = []
+        let dbBotId = "";
         const { headers, body } = req;
+
+        let botInst = isVaildBot(headers["x-works-botid"],botInstList);
+        console.log(botInst);
+        if(botInst===0){
+            reject()
+        }else { 
+            dbBotId = botInst.botCode;
+        }
+
+
         switch (body.type) {
             case "message":
                 if (body.content.postback) {
-                    if (body.content.postback === "start") { body.content.postback = "C00-T10000";}
+                    if (body.content.postback === "start") { body.content.postback = botInst.botStartCode;}
                     let pbCountList = body.content.postback.split(",");
                     for (let xi of pbCountList) {
                         retArray.push(
@@ -145,10 +152,10 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
                 }
                 //단순 텍스트 입력인 경우 
                 else if (body.content.type === "text") {
-                    let botInst = isVaildBot(headers["x-works-botid"],botInstList);
+
                     if (botInst) {
                         if (body.content.text.charCodeAt(0) === 35) {
-                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, hashSearch(body.content.text.slice(1).toUpperCase(),actionInstList)))
+                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, hashSearch(body.content.text.slice(1).toUpperCase(),actionInstList,botInst)))
                             resolve(retArray)
                         }
 
@@ -168,16 +175,11 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
                                         resolve(retArray)
                                     }
                                 }
-
-
                             }
 
                             if(retArray.length===0){
-                                if(body.content.text==="주요 판촉자료"){break;}
-                                if(body.content.text==="좋아요"){break;}
-                                if(body.content.text==="메인 화면"){break;}
-                            retArray.push(makeAnswerJson(headers["x-works-botid"], body,{contType:"text",contText:"필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #식사) \n 메인화면으로 돌아갑니다."} ))
-                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont("C00-T10000", contentInstList)))
+                            retArray.push(makeAnswerJson(headers["x-works-botid"], body,{contType:"text",contText:"필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #핼프) \n 메인화면으로 돌아갑니다."}))
+                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
                             resolve(retArray);
                             }
                         }
@@ -212,9 +214,10 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
     });
 }
 
-let responseBotMsg = async function (obj,baseHeaders) {
-    
+let responseBotMsg = async function (objArray,baseHeaders) {
 
+
+    console.log(objArray);
     /*  Thumbs up tailing
     obj[obj.length - 1].json.content.quickReply ={
         "items": [
@@ -246,7 +249,7 @@ let responseBotMsg = async function (obj,baseHeaders) {
     });
     //test
 
-    for await (let ti of obj) {
+    for await (let ti of objArray) {
         if (ti === 0) { continue };
         let startTime = 0;
         let endTime = 0;

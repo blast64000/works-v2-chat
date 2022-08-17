@@ -33,10 +33,10 @@ const Main = async function (){
       timeout: 3000});
 
 
-    //modifyBot("GET","3904290")
+    modifyBot("GET","3873810",{defaultRichmenuId:''})
     //modifyBotUser("GET","3904290","21342","jyyoon426@daewoong.co.kr");
     //modifyBotUser("POST","3904290","21342","changwolf@daewoong.co.kr");
-    sendDirectMsg("하하하하","blast64000@hbcookie.com",0);
+    //sendDirectMsg("하하하하","blast64000@hbcookie.com",0);
 
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
     
@@ -44,7 +44,9 @@ const Main = async function (){
     //addBot("GET");
 
     //리치메뉴 등록 세트
-    //addRichMenu("GET","3904290");  //144383
+
+    //modifyRichMenu("DELETE","3873810","144430")
+    //addRichMenu("GET","3873810");  //144383
     //enrollfileLink("3904290","fexu_2500_843.png");
     //uploadfile("fexu_2500_843.png",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1657777541597561865.1657863941.1.3904290.0.0.0/fexu_2500_843.png`);
     //appendRichMenuImage("POST","3904290",'144526'); 
