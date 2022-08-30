@@ -14,9 +14,9 @@ const dbconn = require("./db-conn.js")
 const lklist = require("./ln-list.js");
 
 
+const hero = require("./app/hero");
 const fexu = require("./app/fexu.js");
 const it = require("./app/it.js");
-
 
 
 const app = express()
@@ -55,9 +55,9 @@ let isVaildBot = function (worksBotNo, botInstList) {
 const initialize = async function () {
     let res = {};
     // 하루 1회 리딩
-    res = await initFunc.getJWT();
-    res.tokenTime = new Date();
-    await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
+    //res = await initFunc.getJWT();
+    //res.tokenTime = new Date();
+    //await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
     // 이후 book.txt 리드
     const fileRes = await fs.readFileSync('books.txt', { encoding: 'utf8', flag: 'r' });
     const axOptions = JSON.parse(fileRes);
@@ -161,10 +161,10 @@ app.post("/it", wraper(async (req, res, next) => {
 
     } catch (err) {
         console.log(Object.getOwnPropertyNames(err))
+        console.log(err.message);
     }
 
 }));
-
 
 app.post("/fexu", wraper(async (req, res, next) => {
     try {
@@ -183,11 +183,32 @@ app.post("/fexu", wraper(async (req, res, next) => {
     } catch (err) {
         console.log(Object.getOwnPropertyNames(err))
     }
-
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
-
 }));
+
+app.post("/hero", wraper(async (req, res, next) => {
+    try {
+        const { headers, body } = req;
+        console.log(headers);
+        console.log(body);
+        let answerObj = await hero.vaildateMessage(req, contentInstList, botInstList, actionInstList);
+        let retMsg = await hero.responseBotMsg(answerObj, baseHeaders);
+
+        logreturn = await hero.json2Text(headers, body);
+        if (logreturn) {
+            hero.log2csv(logreturn, __dirname);
+        }
+
+    } catch (err) {
+        console.log(Object.getOwnPropertyNames(err))
+    }
+    // 데이터 전송
+    //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
+}));
+
+
+
 
 app.get("/botImgFile/*", function (req, res) {
     try {

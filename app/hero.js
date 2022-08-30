@@ -17,7 +17,6 @@ let isVaildBot = function (worksBotNo, botInstList) {
 
 let findCurrCont = function (postback, conList) {
     x = undefined;
-
     x = conList.find(o => o.contCode === postback);
     if (x == undefined) {
         return undefined;
@@ -222,8 +221,7 @@ let responseBotMsg = async function (objArray,baseHeaders) {
     
 
     console.log(objArray);
-    /*  Thumbs up tailing
-    obj[obj.length - 1].json.content.quickReply ={
+    objArray[objArray.length - 1].json.content.quickReply ={
         "items": [
           {
             "imageUrl": "https://illustoon.com/photo/4292.png",
