@@ -220,7 +220,8 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
 let responseBotMsg = async function (objArray,baseHeaders) {
     
 
-    console.log(objArray);
+//    console.log(objArray);
+/*
     objArray[objArray.length - 1].json.content.quickReply ={
         "items": [
           {
@@ -242,6 +243,7 @@ let responseBotMsg = async function (objArray,baseHeaders) {
           }
         ]
       }
+      */
 
     let reqConfig = axios.create({
         baseURL: `https://www.worksapis.com/v1.0/bots/`,

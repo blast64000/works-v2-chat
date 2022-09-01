@@ -244,6 +244,7 @@ let responseBotMsg = async function (objArray,baseHeaders) {
           }
         ]
       }
+      */
 
     let reqConfig = axios.create({
         baseURL: `https://www.worksapis.com/v1.0/bots/`,

@@ -135,6 +135,7 @@ app.post("*", wraper(async (req, res, next) => {
     const { headers, method, url } = req;
     //    console.log(Object.keys(req));
     console.log(`\n== check post method: ${method}, url :${url} ==`);
+    console.log(headers);
     if (fexu.isVaildBot(headers["x-works-botid"], botInstList)) {
         next();
     }
