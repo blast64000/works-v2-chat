@@ -332,11 +332,11 @@ payload["init_force"] = {
 
     "content": {
       "type": "button_template",
-      "contentText": "안녕하세요 펙수클루 챗봇입니다.\n 사전 테스트를 시작합니다",
+      "contentText": "안녕하세요 영웅톡 챗봇입니다.\n 사전 테스트를 시작합니다",
       "actions": [{
         "type": "message",
         "label": "시작하기",
-        "postback": "C00-F10000"
+        "postback": "c100-50001"
       }]
     }
 }

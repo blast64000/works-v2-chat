@@ -19,7 +19,7 @@ const sendDirectMsg = async function(msg,userId,isInit){
     baseURL: 'https://www.worksapis.com/v1.0/bots/',
     headers: baseHeaders,
     timeout: 3000});
-      apiFunc = await reqConfig2.post(`3873810/users/${userId}/messages`, (isInit? pay["init_force"]:pay["flex"]));
+      apiFunc = await reqConfig2.post(`3000497/users/${userId}/messages`, (isInit? pay["init_force"]:pay["flex"]));
   }
 
 const Main = async function (){
@@ -33,10 +33,10 @@ const Main = async function (){
       timeout: 3000});
 
 
-    modifyBot("GET","3873810",{defaultRichmenuId:''})
+    modifyBot("PATCH","3000497",{photoUrl:"https://chat.daewoong.co.kr/botImgFile/hero/hero_main.png"})
     //modifyBotUser("GET","3904290","21342","jyyoon426@daewoong.co.kr");
     //modifyBotUser("POST","3904290","21342","changwolf@daewoong.co.kr");
-    //sendDirectMsg("하하하하","blast64000@hbcookie.com",0);
+    //sendDirectMsg("하하하하","jwkim023@daewoong.co.kr",1);
 
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
     

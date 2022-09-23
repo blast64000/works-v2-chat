@@ -19,7 +19,7 @@ const refreshCode = async function(){
     apiFunc = await thisReqConfig.post(`refresh`, {clisecret:options.clisecret});
 
     if(apiFunc.status===200){
-      const fileRes = await fs.readFileSync('../books.txt', { encoding: 'utf8', flag: 'r' });
+      const fileRes = await fs.readFileSync('/home/develop/works-v2-chat/books.txt', { encoding: 'utf8', flag: 'r' });
 
       let msgReqConfig = axios.create({
         headers: {"Content-Type": `application/json`, 'Authorization': `Bearer ${JSON.parse(fileRes).access_token}`},
