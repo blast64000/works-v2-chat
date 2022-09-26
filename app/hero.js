@@ -17,6 +17,7 @@ let isVaildBot = function (worksBotNo, botInstList) {
 
 let findCurrCont = function (postback, conList) {
     x = undefined;
+    
     x = conList.find(o => o.contCode === postback);
     if (x == undefined) {
         return undefined;

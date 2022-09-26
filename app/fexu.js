@@ -221,9 +221,9 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
 let responseBotMsg = async function (objArray,baseHeaders) {
     
 
-    console.log(objArray);
-    /*  Thumbs up tailing
-    obj[obj.length - 1].json.content.quickReply ={
+//    console.log(objArray);
+/*
+    objArray[objArray.length - 1].json.content.quickReply ={
         "items": [
           {
             "imageUrl": "https://illustoon.com/photo/4292.png",

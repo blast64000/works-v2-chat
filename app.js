@@ -55,9 +55,9 @@ let isVaildBot = function (worksBotNo, botInstList) {
 const initialize = async function () {
     let res = {};
     // 하루 1회 리딩
-    //res = await initFunc.getJWT();
-    //res.tokenTime = new Date();
-    //await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
+    res = await initFunc.getJWT();
+    res.tokenTime = new Date();
+    await fsPromises.writeFile("books.txt", JSON.stringify(res) + `\n`, { encoding: "utf8", flag: "w", mode: 0o666 });
     // 이후 book.txt 리드
     const fileRes = await fs.readFileSync('books.txt', { encoding: 'utf8', flag: 'r' });
     const axOptions = JSON.parse(fileRes);
@@ -203,6 +203,8 @@ app.post("/hero", wraper(async (req, res, next) => {
 
     } catch (err) {
         console.log(Object.getOwnPropertyNames(err))
+        console.log(err.message);
+        
     }
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
