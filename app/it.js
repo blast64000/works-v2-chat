@@ -66,6 +66,12 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             }
             return retObj;
             break;
+            
+        case "file":
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.originalContentUrl = contObj.contPreImg;
+            return retObj;
+            break;
 
         case "carousel":
             console.log(contObj);
@@ -130,7 +136,6 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
         const { headers, body } = req;
 
         let botInst = isVaildBot(headers["x-works-botid"],botInstList);
-        console.log(botInst);
         if(botInst===0){
             reject()
         }else { 

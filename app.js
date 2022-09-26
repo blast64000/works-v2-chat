@@ -135,7 +135,6 @@ app.post("*", wraper(async (req, res, next) => {
     const { headers, method, url } = req;
     //    console.log(Object.keys(req));
     console.log(`\n== check post method: ${method}, url :${url} ==`);
-    console.log(headers);
     if (fexu.isVaildBot(headers["x-works-botid"], botInstList)) {
         next();
     }
@@ -172,7 +171,6 @@ app.post("/fexu", wraper(async (req, res, next) => {
         const { headers, body } = req;
         console.log(headers);
         console.log(body);
-
         let answerObj = await fexu.vaildateMessage(req, contentInstList, botInstList, actionInstList);
         let retMsg = await fexu.responseBotMsg(answerObj, baseHeaders);
 

@@ -29,6 +29,7 @@ let findCurrCont = function (postback, conList) {
 let makeAnswerJson = function (worksBotId, reqbody, contObj) {
 
     if(!contObj) {return 0}
+    
 
     let retObj = {
         botId: worksBotId,
@@ -59,6 +60,7 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             retObj.json.content.type = contObj.contType;
             retObj.json.content.contentText = contObj.contText;
             retObj.json.content.actions = [];
+            
             for (let qi of contObj.contActionSet) {
                 retObj.json.content.actions.push({
                     type: qi.actType,
@@ -68,14 +70,20 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             }
             return retObj;
             break;
+        
+        case "file":
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.originalContentUrl = contObj.contPreImg;
+            return retObj;
+            break;
 
         case "carousel":
-            console.log(contObj);
             if (!contObj.outArray) { return 0 };
             retObj.json.content.type = contObj.contType;
             retObj.json.content.columns = contObj.outArray;
             return retObj;
             break;
+
 
         default:
             return {};
@@ -126,13 +134,13 @@ let hashSearch = function (inputText, actionInstList,botInst) {
 
 const vaildateMessage = function (req, contentInstList,botInstList,actionInstList) {
     return new Promise((resolve, reject) => {
+        
 
         retArray = []
         let dbBotId = "";
         const { headers, body } = req;
 
         let botInst = isVaildBot(headers["x-works-botid"],botInstList);
-        console.log(botInst);
         if(botInst===0){
             reject()
         }else { 
@@ -198,7 +206,6 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
                 break;
             case "postback":
                 let pbCountList = body.data.split(",");
-                console.log(pbCountList);
                 for (let xi of pbCountList) {
                     retArray.push(
                         makeAnswerJson(headers["x-works-botid"], body, findCurrCont(xi.trim(), contentInstList))
@@ -319,7 +326,6 @@ let json2Text = function(headers,body){
     if(retString===""){
         reject("");
     }else { 
-        console.log(retString);
         resolve(retString);
     }
 

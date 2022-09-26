@@ -17,7 +17,7 @@ let isVaildBot = function (worksBotNo, botInstList) {
 
 let findCurrCont = function (postback, conList) {
     x = undefined;
-    
+
     x = conList.find(o => o.contCode === postback);
     if (x == undefined) {
         return undefined;
@@ -29,6 +29,7 @@ let findCurrCont = function (postback, conList) {
 let makeAnswerJson = function (worksBotId, reqbody, contObj) {
 
     if(!contObj) {return 0}
+
 
     let retObj = {
         botId: worksBotId,
@@ -60,20 +61,40 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             retObj.json.content.contentText = contObj.contText;
             retObj.json.content.actions = [];
             for (let qi of contObj.contActionSet) {
+                if(qi.actIdentCode==="*"){
                 retObj.json.content.actions.push({
                     type: qi.actType,
                     label: qi.actName,
                     postback: qi.nextContCode
                 })
+
+                } else { 
+                    
+                    if(qi.actIdentCode==reqbody.source.domainId){
+                        retObj.json.content.actions.push({
+                            type: qi.actType,
+                            label: qi.actName,
+                            postback: qi.nextContCode
+                        })
+
+                    }
+                }
+
+                
+
             }
             return retObj;
             break;
 
         case "carousel":
-            console.log(contObj);
             if (!contObj.outArray) { return 0 };
             retObj.json.content.type = contObj.contType;
             retObj.json.content.columns = contObj.outArray;
+            return retObj;
+            break;
+        case "file":
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.originalContentUrl = contObj.contPreImg;
             return retObj;
             break;
 
@@ -132,7 +153,6 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
         const { headers, body } = req;
 
         let botInst = isVaildBot(headers["x-works-botid"],botInstList);
-        console.log(botInst);
         if(botInst===0){
             reject()
         }else { 
