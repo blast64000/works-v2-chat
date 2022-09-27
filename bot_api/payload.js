@@ -3,7 +3,7 @@ let payload = {};
 payload["refresh"]={
   "content": {
     "type": "text",
-    "text": "token is refreshed"
+    "text": "안녕하세요"
   }
 }
 

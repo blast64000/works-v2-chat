@@ -5,7 +5,7 @@ const axios = require("axios");
 let pay = require("./payload.js");
 const FormData = require('form-data');
 const request = require('request');
-let options = require("./options.js")
+let options = require("../options.js")
 
 
 
@@ -15,14 +15,6 @@ let baseHeaders={
 };
 
 
-const sendDirectMsg = async function(msg,userId,isInit){
-
-  reqConfig2 = axios.create({
-    baseURL: 'https://www.worksapis.com/v1.0/bots/',
-    headers: baseHeaders,
-    timeout: 3000});
-      apiFunc = await reqConfig2.post(`${options.fexu_bot}/users/${userId}/messages`, (isInit? pay["init_force"]:pay["flex"]));
-  }
 
 const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
@@ -35,14 +27,15 @@ const Main = async function (){
       timeout: 3000});
 
 
-    modifyBot("PATCH",`${options.fexu_bot}`,{photoUrl:"https://chat.daewoong.co.kr/botImgFile/hero/hero_main.png"})
+    modifyBot("GET",`${options.it_bot}`,{botName:"IT운영팀 챗봇"});
+    //sendDirectMsg("하하하하","stevelight88@hanall.co.kr",0);
+    
     //modifyBotUser("GET","3904290","21342","jyyoon426@daewoong.co.kr");
     //modifyBotUser("POST","3904290","21342","changwolf@daewoong.co.kr");
-    //sendDirectMsg("하하하하","jwkim023@daewoong.co.kr",1);
-
+    
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
     
-    //get_users_email("test01@hbcookie.com")
+    //get_users_email("stevelight88@hanall.co.kr")
     //addBot("GET");
 
     //리치메뉴 등록 세트
@@ -59,6 +52,17 @@ const Main = async function (){
 
     })
 }
+
+const sendDirectMsg = async function(msg,userId,isInit){
+
+  reqConfig2 = axios.create({
+    baseURL: 'https://www.worksapis.com/v1.0/bots/',
+    headers: baseHeaders,
+    timeout: 3000});
+      apiFunc = await reqConfig2.post(`${options.hero_bot}/users/${userId}/messages`, (isInit? pay["init_force"]:pay["refresh"]));
+  }
+
+
 let uploadfile = async function(filename,url){
 
   let options = {

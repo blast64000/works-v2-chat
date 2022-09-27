@@ -28,6 +28,7 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
 
     if(!contObj) {return 0}
 
+
     let retObj = {
         botId: worksBotId,
         userId: reqbody.source.userId,
@@ -57,6 +58,7 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             retObj.json.content.type = contObj.contType;
             retObj.json.content.contentText = contObj.contText;
             retObj.json.content.actions = [];
+            
             for (let qi of contObj.contActionSet) {
                 retObj.json.content.actions.push({
                     type: qi.actType,
@@ -74,12 +76,12 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             break;
 
         case "carousel":
-            console.log(contObj);
             if (!contObj.outArray) { return 0 };
             retObj.json.content.type = contObj.contType;
             retObj.json.content.columns = contObj.outArray;
             return retObj;
             break;
+
 
         default:
             return {};
@@ -92,9 +94,9 @@ let hashSearch = function (inputText, actionInstList,botInst) {
         contType: "carousel",
         outArray: []
     }
-    
+    console.log(botInst.botStartNode.contActSetCode.slice(0,5));
     for (let hs of actionInstList) {
-        if (hs.actkeyWord && (hs.actSetCode.slice(0, 5) === botInst.botStartNode.contCode.slice(0,5)) && hs.actkeyWord.replace(/ /g, '').indexOf(inputText) != -1) {
+        if (hs.actkeyWord && (hs.actSetCode.slice(0, 5) === botInst.botStartNode.contActSetCode.slice(0,5)) && hs.actkeyWord.replace(/ /g, '').indexOf(inputText) != -1) {
             if (arrayCount >= 10) {
                 break;
             }

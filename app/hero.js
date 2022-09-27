@@ -70,7 +70,7 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
 
                 } else {
 
-                    if (qi.actIdentCode == reqbody.source.domainId) {
+                    if (options[qi.actIdentCode] === reqbody.source.domainId) {
                         retObj.json.content.actions.push({
                             type: qi.actType,
                             label: qi.actName,
@@ -117,7 +117,7 @@ let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
             }
 
             else {
-                if( !(hs.actIdentCode==="*") && !(hs.actIdentCode==reqbody.source.domainId)) { continue;}
+                if( !(hs.actIdentCode==="*") && !(options[hs.actIdentCode]===reqbody.source.domainId)) { continue;}
                 arrayCount++;
                 retobj.outArray.push(
                     {

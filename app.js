@@ -126,15 +126,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.all('*', function (req, res, next) {
-    const { headers, method, url } = req;
+    const { headers,body, method, url } = req;
     console.log(`\n== check all input method: ${method}, url :${url} ==`);
     next();
 });
 
 app.post("*", wraper(async (req, res, next) => {
-    const { headers, method, url } = req;
+    const { headers,body, method, url } = req;
     //    console.log(Object.keys(req));
     console.log(`\n== check post method: ${method}, url :${url} ==`);
+
+    console.log(headers);
+    console.log(body);
     if (fexu.isVaildBot(headers["x-works-botid"], botInstList)) {
         next();
     }
@@ -152,9 +155,9 @@ app.post("/it", wraper(async (req, res, next) => {
         console.log(headers);
         console.log(body);
 
-        let answerObj = await fexu.vaildateMessage(req, contentInstList, botInstList, actionInstList);
-        let retMsg = await fexu.responseBotMsg(answerObj, baseHeaders);
-        logreturn = await fexu.json2Text(headers, body);
+        let answerObj = await it.vaildateMessage(req, contentInstList, botInstList, actionInstList);
+        let retMsg = await it.responseBotMsg(answerObj, baseHeaders);
+        logreturn = await it.json2Text(headers, body);
         if (logreturn) {
             it.log2csv(logreturn, __dirname);
         }
