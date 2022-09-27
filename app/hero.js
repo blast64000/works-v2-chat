@@ -28,7 +28,7 @@ let findCurrCont = function (postback, conList) {
 
 let makeAnswerJson = function (worksBotId, reqbody, contObj) {
 
-    if(!contObj) {return 0}
+    if (!contObj) { return 0 }
 
 
     let retObj = {
@@ -61,16 +61,16 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             retObj.json.content.contentText = contObj.contText;
             retObj.json.content.actions = [];
             for (let qi of contObj.contActionSet) {
-                if(qi.actIdentCode==="*"){
-                retObj.json.content.actions.push({
-                    type: qi.actType,
-                    label: qi.actName,
-                    postback: qi.nextContCode
-                })
+                if (qi.actIdentCode === "*") {
+                    retObj.json.content.actions.push({
+                        type: qi.actType,
+                        label: qi.actName,
+                        postback: qi.nextContCode
+                    })
 
-                } else { 
-                    
-                    if(qi.actIdentCode==reqbody.source.domainId){
+                } else {
+
+                    if (qi.actIdentCode == reqbody.source.domainId) {
                         retObj.json.content.actions.push({
                             type: qi.actType,
                             label: qi.actName,
@@ -80,7 +80,7 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
                     }
                 }
 
-                
+
 
             }
             return retObj;
@@ -103,35 +103,39 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
     }
 };
 
-let hashSearch = function (inputText, actionInstList,botInst) {
+let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
     let arrayCount = 0;
     let retobj = {
         contType: "carousel",
         outArray: []
     }
-    console.log(botInst.botStartNode.contActSetCode.slice(0,5));
+    console.log(botInst.botStartNode.contActSetCode.slice(0, 5));
     for (let hs of actionInstList) {
-        if (hs.actkeyWord && (hs.actSetCode.slice(0, 5) === botInst.botStartNode.contActSetCode.slice(0,5)) && hs.actkeyWord.replace(/ /g, '').indexOf(inputText) != -1) {
+        if (hs.actkeyWord && (hs.actSetCode.slice(0, 5) === botInst.botStartNode.contActSetCode.slice(0, 5)) && hs.actkeyWord.replace(/ /g, '').indexOf(inputText) != -1) {
             if (arrayCount >= 10) {
                 break;
             }
-            arrayCount++;
-            retobj.outArray.push(
-                {
-                    "title": hs.actName,
-                    "text": hs.actName,
-                    "defaultAction": {
-                        "type": "postback",
-                        "label": "자세히 보기",
-                        "data": hs.nextContCode
-                    },
-                    "actions": [{
-                        "type": "postback",
-                        "label": "자세히 보기",
-                        "data": hs.nextContCode
-                    }]
-                }
-            )
+
+            else {
+                if( !(hs.actIdentCode==="*") && !(hs.actIdentCode==reqbody.source.domainId)) { continue;}
+                arrayCount++;
+                retobj.outArray.push(
+                    {
+                        "title": hs.actName,
+                        "text": hs.actName,
+                        "defaultAction": {
+                            "type": "postback",
+                            "label": "자세히 보기",
+                            "data": hs.nextContCode
+                        },
+                        "actions": [{
+                            "type": "postback",
+                            "label": "자세히 보기",
+                            "data": hs.nextContCode
+                        }]
+                    }
+                )
+            }
         }
     }
 
@@ -145,17 +149,17 @@ let hashSearch = function (inputText, actionInstList,botInst) {
 
 };
 
-const vaildateMessage = function (req, contentInstList,botInstList,actionInstList) {
+const vaildateMessage = function (req, contentInstList, botInstList, actionInstList) {
     return new Promise((resolve, reject) => {
 
         retArray = []
         let dbBotId = "";
         const { headers, body } = req;
 
-        let botInst = isVaildBot(headers["x-works-botid"],botInstList);
-        if(botInst===0){
+        let botInst = isVaildBot(headers["x-works-botid"], botInstList);
+        if (botInst === 0) {
             reject()
-        }else { 
+        } else {
             dbBotId = botInst.botCode;
         }
 
@@ -163,7 +167,7 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
         switch (body.type) {
             case "message":
                 if (body.content.postback) {
-                    if (body.content.postback === "start") { body.content.postback = botInst.botStartCode;}
+                    if (body.content.postback === "start") { body.content.postback = botInst.botStartCode; }
                     let pbCountList = body.content.postback.split(",");
                     for (let xi of pbCountList) {
                         retArray.push(
@@ -176,14 +180,14 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
                 else if (body.content.type === "text") {
                     if (botInst) {
                         if (body.content.text.charCodeAt(0) === 35) {
-                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, hashSearch(body.content.text.slice(1).toUpperCase(),actionInstList,botInst)))
+                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, hashSearch(body.content.text.slice(1).toUpperCase(), actionInstList, botInst, body)))
                             resolve(retArray)
                         }
 
                         else {
                             for (let ti of botInst.botRevTxtList) {
                                 if (ti.TXT_INP_TXT === body.content.text) {
-                                    if(ti.TXT_CONT_CD){
+                                    if (ti.TXT_CONT_CD) {
                                         let txtpbCountList = ti.TXT_CONT_CD.split(",");
                                         for (let zi of txtpbCountList) {
                                             retArray.push(
@@ -191,20 +195,20 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
                                             );
                                         }
                                         resolve(retArray)
-                                    }else{
+                                    } else {
                                         //★ 메세지 전송 필요 
                                         resolve(retArray)
                                     }
                                 }
                             }
 
-                            if(retArray.length===0){
-                                if(body.content.text==="주요 판촉자료"){break;}
-                                if(body.content.text==="좋아요"){break;}
-                                if(body.content.text==="메인 화면"){break;}
-                                retArray.push(makeAnswerJson(headers["x-works-botid"], body,{contType:"text",contText:"필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #핼프) \n 메인화면으로 돌아갑니다."}))
+                            if (retArray.length === 0) {
+                                if (body.content.text === "주요 판촉자료") { break; }
+                                if (body.content.text === "좋아요") { break; }
+                                if (body.content.text === "메인 화면") { break; }
+                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: "필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #핼프) \n 메인화면으로 돌아갑니다." }))
                                 retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
-                                    resolve(retArray);
+                                resolve(retArray);
                             }
                         }
 
@@ -238,33 +242,33 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
     });
 }
 
-let responseBotMsg = async function (objArray,baseHeaders) {
-    
+let responseBotMsg = async function (objArray, baseHeaders) {
 
-//    console.log(objArray);
-/*
-    objArray[objArray.length - 1].json.content.quickReply ={
-        "items": [
-          {
-            "imageUrl": "https://illustoon.com/photo/4292.png",
-            "action": {
-              "type": "message",
-              "label": "좋아요",
-              "text": "좋아요"
-            }
-          },
-          {
-            "imageUrl": "https://illustoon.com/photo/211.png",
-            "action": {
-              "type": "message",
-              "label": "뒤로가기",
-              "text": "뒤로가기",
-              "postback":"C00-F10000"
-            }
+
+    //    console.log(objArray);
+    /*
+        objArray[objArray.length - 1].json.content.quickReply ={
+            "items": [
+              {
+                "imageUrl": "https://illustoon.com/photo/4292.png",
+                "action": {
+                  "type": "message",
+                  "label": "좋아요",
+                  "text": "좋아요"
+                }
+              },
+              {
+                "imageUrl": "https://illustoon.com/photo/211.png",
+                "action": {
+                  "type": "message",
+                  "label": "뒤로가기",
+                  "text": "뒤로가기",
+                  "postback":"C00-F10000"
+                }
+              }
+            ]
           }
-        ]
-      }
-      */
+          */
 
     let reqConfig = axios.create({
         baseURL: `https://www.worksapis.com/v1.0/bots/`,
@@ -291,62 +295,62 @@ let responseBotMsg = async function (objArray,baseHeaders) {
 
 let makeLogName = function () {
     let yourDate = new Date()
-    yourDate.setHours(yourDate.getHours()+9);
+    yourDate.setHours(yourDate.getHours() + 9);
     return yourDate.toISOString().split('T')[0]
 };
 
 
 //concept : json 으로 작성하고 key repalce 후 csv 형식으로 작성하는것으로 변경 
-const writeJson = function(headers,body){
-    
+const writeJson = function (headers, body) {
+
 }
 
 
-let json2Text = function(headers,body){
+let json2Text = function (headers, body) {
 
     return new Promise((resolve, reject) => {
-    let retString = "";
-    if(headers["x-works-botid"]){
-        retString+=`${headers["x-works-botid"]}, `;
-    }
+        let retString = "";
+        if (headers["x-works-botid"]) {
+            retString += `${headers["x-works-botid"]}, `;
+        }
 
-    if(body.type){
-        let newDate = new Date(body.issuedTime);
-        newDate.setHours(newDate.getHours()+9);
-        retString+=`${newDate.toISOString()}, ${body.type}, `
-    }  
+        if (body.type) {
+            let newDate = new Date(body.issuedTime);
+            newDate.setHours(newDate.getHours() + 9);
+            retString += `${newDate.toISOString()}, ${body.type}, `
+        }
 
-    if(body.source){
-        retString+=`${body.source.userId}, ${body.source.domainId}, `
-    }
+        if (body.source) {
+            retString += `${body.source.userId}, ${body.source.domainId}, `
+        }
 
-    if(body.content){
-        retString+=`${body.content.type}, ${body.content.text}, `
+        if (body.content) {
+            retString += `${body.content.type}, ${body.content.text}, `
 
-        if(body.content.postback){
-            retString+=`${body.content.postback}`
-        } else { 
-            retString+=` `
+            if (body.content.postback) {
+                retString += `${body.content.postback}`
+            } else {
+                retString += ` `
+            }
+
+
+        } else {
+            retString += ` , , `
         }
 
 
-    }else{
-        retString+=` , , `
-    }
 
-    
+        if (retString === "") {
+            reject("");
+        } else {
+            console.log(retString);
+            resolve(retString);
+        }
 
-    if(retString===""){
-        reject("");
-    }else { 
-        console.log(retString);
-        resolve(retString);
-    }
-
-});
+    });
 }
 
-let log2csv = function (inpString ,dirName) {
+let log2csv = function (inpString, dirName) {
 
     mystring = path.join(dirName, "log", `${makeLogName()}.csv`);
 
@@ -369,5 +373,5 @@ let log2csv = function (inpString ,dirName) {
 
 
 
-const fexu = {vaildateMessage,responseBotMsg, json2Text, log2csv,isVaildBot};
-module.exports = fexu ;
+const fexu = { vaildateMessage, responseBotMsg, json2Text, log2csv, isVaildBot };
+module.exports = fexu;
