@@ -3,7 +3,7 @@ const axios = require("axios");
 const path = require("path");
 const options = require("../options.js");
 
-
+let my_car = require("./hero.json");
 
 let isVaildBot = function (worksBotNo, botInstList) {
     for (bi of botInstList) {
@@ -26,7 +26,7 @@ let findCurrCont = function (postback, conList) {
     }
 };
 
-let makeAnswerJson = function (worksBotId, reqbody, contObj) {
+let makeAnswerJson = function (worksBotId, reqbody, contObj,sales_list) {
 
     if (!contObj) { return 0 }
 
@@ -34,7 +34,7 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
     let retObj = {
         botId: worksBotId,
         userId: reqbody.source.userId,
-
+        dbflag: false,
         json: {
             content: {
             }
@@ -76,11 +76,8 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
                             label: qi.actName,
                             postback: qi.nextContCode
                         })
-
                     }
                 }
-
-
 
             }
             return retObj;
@@ -98,6 +95,30 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
             return retObj;
             break;
 
+        case "db_access":
+            console.log(reqbody);
+            console.log(contObj);
+            for ( xi of sales_list){
+                if(xi.SALE_DATE.toISOString().substring(0,7)===(new Date().toISOString().substring(0,7))){
+
+                    if(reqbody.source.userId===xi.SALE_EX_KEY){
+                        console.log(xi);
+                        console.log(my_car);
+                        my_car.body.contents[0].text = `${xi.SALE_NAME}님 실적`
+                        my_car.body.contents[3].contents[1].text = `${xi.SALE_GROUND.toLocaleString()}`
+                        my_car.body.contents[4].contents[1].text=`${xi.SALE_UP_AMT.toLocaleString()}`
+                        my_car.body.contents[6].contents[1].contents[1].text=`${xi.SALE_FINAL.toLocaleString()}`
+                    }
+                }
+
+            }
+
+            retObj.json.content.type = "flex";
+            retObj.json.content.altText = "DB ACCESS 예시";
+            retObj.json.content.contents = my_car;
+            retObj.dbflag=true;
+            return retObj;
+            break;
         default:
             return {};
     }
@@ -149,7 +170,8 @@ let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
 
 };
 
-const vaildateMessage = function (req, contentInstList, botInstList, actionInstList) {
+
+const vaildateMessage = function (req, contentInstList, botInstList, actionInstList,sales_list) {
     return new Promise((resolve, reject) => {
 
         retArray = []
@@ -167,11 +189,11 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
         switch (body.type) {
             case "message":
                 if (body.content.postback) {
-                    if (body.content.postback === "start") { body.content.postback = botInst.botStartCode; }
+                    if (body.content.postback === "start") { body.content.postback = botInst.botStartCode;}
                     let pbCountList = body.content.postback.split(",");
                     for (let xi of pbCountList) {
                         retArray.push(
-                            makeAnswerJson(headers["x-works-botid"], body, findCurrCont(xi.trim(), contentInstList))
+                            makeAnswerJson(headers["x-works-botid"], body, findCurrCont(xi.trim(), contentInstList),sales_list)
                         )
                     }
                     resolve(retArray)
@@ -203,9 +225,6 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                             }
 
                             if (retArray.length === 0) {
-                                if (body.content.text === "주요 판촉자료") { break; }
-                                if (body.content.text === "좋아요") { break; }
-                                if (body.content.text === "메인 화면") { break; }
                                 retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: "필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #핼프) \n 메인화면으로 돌아갑니다." }))
                                 retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
                                 resolve(retArray);
@@ -243,8 +262,6 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
 }
 
 let responseBotMsg = async function (objArray, baseHeaders) {
-
-
     //    console.log(objArray);
     /*
         objArray[objArray.length - 1].json.content.quickReply ={
@@ -271,19 +288,21 @@ let responseBotMsg = async function (objArray, baseHeaders) {
           */
 
     let reqConfig = axios.create({
-        baseURL: `https://www.worksapis.com/v1.0/bots/`,
+        baseURL: `https://www.worksapis.com/v1.0/`,
         headers: baseHeaders,
         timeout: 3000
     });
     //test
+
 
     for await (let ti of objArray) {
         if (ti === 0) { continue };
         let startTime = 0;
         let endTime = 0;
 
+
         startTime = new Date().getTime();
-        apiFunc = await reqConfig.post(`${ti.botId}/users/${ti.userId}/messages`, ti.json);
+        apiFunc = await reqConfig.post(`bots/${ti.botId}/users/${ti.userId}/messages`, ti.json);
         endTime = new Date().getTime();
         console.log(endTime - startTime);
         await new Promise(resolve => setTimeout(resolve,
