@@ -95,34 +95,45 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj,sales_list) {
             return retObj;
             break;
 
-        case "db_access":
-            console.log(reqbody);
-            console.log(contObj);
-            for ( xi of sales_list){
-                if(xi.SALE_DATE.toISOString().substring(0,7)===(new Date().toISOString().substring(0,7))){
 
+        case "db_access":
+            let isSale = false;
+            for ( xi of sales_list){
+                if(xi.SALE_DATE.addHours(9).toISOString().substring(0,7)===(new Date().addHours(9).toISOString().substring(0,7))){
                     if(reqbody.source.userId===xi.SALE_EX_KEY){
-                        console.log(xi);
-                        console.log(my_car);
+                        isSale=true;
                         my_car.body.contents[0].text = `${xi.SALE_NAME}님 실적`
+                        my_car.body.contents[1].text = new Date().toISOString().substring(0,7)
                         my_car.body.contents[3].contents[1].text = `${xi.SALE_GROUND.toLocaleString()}`
                         my_car.body.contents[4].contents[1].text=`${xi.SALE_UP_AMT.toLocaleString()}`
                         my_car.body.contents[6].contents[1].contents[1].text=`${xi.SALE_FINAL.toLocaleString()}`
                     }
                 }
-
             }
 
+            if(isSale){
             retObj.json.content.type = "flex";
             retObj.json.content.altText = "DB ACCESS 예시";
             retObj.json.content.contents = my_car;
             retObj.dbflag=true;
             return retObj;
+            } 
+            else {
+                retObj.json.content.type = "text";
+                retObj.json.content.text = "실적 결과가 없습니다";    
+                return retObj;
+            }
+
             break;
         default:
             return {};
     }
 };
+
+Date.prototype.addHours= function(h){
+    this.setHours(this.getHours()+h);
+    return this;
+}
 
 let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
     let arrayCount = 0;
@@ -300,6 +311,7 @@ let responseBotMsg = async function (objArray, baseHeaders) {
         let startTime = 0;
         let endTime = 0;
 
+        console.log(objArray);
 
         startTime = new Date().getTime();
         apiFunc = await reqConfig.post(`bots/${ti.botId}/users/${ti.userId}/messages`, ti.json);

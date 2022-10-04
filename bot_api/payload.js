@@ -3,7 +3,7 @@ let payload = {};
 payload["refresh"]={
   "content": {
     "type": "text",
-    "text": "안녕하세요"
+    "text": "token refresh"
   }
 }
 
@@ -465,9 +465,10 @@ payload["modifyBotUser_Post"] = {
 payload["modifyBotUser_Get"] = {};
 payload["modifyBotUser_Delete"] = {};
 
-payload["addRichMenu_Post"] = {
+//펙수 2500 x 843 
+payload["addRichMenu_Post_fexu"] = {
 
-  "richmenuName": "펙수 메인 리치메뉴_v1",
+  "richmenuName": "펙수 메인 리치메뉴_v2",
   "areas": [
     //1.메인화면
     {
@@ -475,7 +476,7 @@ payload["addRichMenu_Post"] = {
         "type": "postback",
         "label": "메인 화면",
         "displayText": "메인 화면",
-        "data":"C00-F10000",
+        "data":"C00-F100000",
       },
       "bounds": {
         "x": 0,
@@ -535,16 +536,98 @@ payload["addRichMenu_Post"] = {
 
 };
 
-payload["modifyRichMenu_Get"] = {};
-payload["modifyRichMenu_Delete"] = {};
+//영웅톡 2500 x 1686
+payload["addRichMenu_Post_hero"] = {
 
-
-payload["appendRichMenuImage_Get"] = {
+  "richmenuName": "영웅톡 v3",
+  "areas": [
+    //1.메인화면
+    {
+      "action": {
+        "type": "message",
+        "label": "메인화면★",
+        "text": "메인화면★",
+        "postback ":"C00-H100004"
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "action": {
+        "type": "message",
+        "label": "메인화면",
+        "text": "메인화면",
+        "postback ":"C00-H100000"
+      },
+      "bounds": {
+        "x": 2,
+        "y": 2,
+        "width": 1248,
+        "height": 841
+      }
+    },
+    //2. 영웅톡 이용 팁
+    {
+      "action": {
+        "type": "message",
+        "label": "이용팁",
+        "text": "이용팁",
+        "postback":"C00-H200001"
+      },
+      "bounds": {
+        "x": 1250,
+        "y": 5,
+        "width": 1250,
+        "height": 843
+      }
+    },//3. 다빈도 문의사항
+    {
+      "action": {
+        "type": "message",
+        "label": "다빈도",
+        "text": "다빈도",
+        "postback":"C00-H200002",
+      },
+      "bounds": {
+        "x": 0,
+        "y": 843,
+        "width": 1250,
+        "height": 843
+      }
+    },//4.추가 문의 요청
+    {
+      "action": {
+        "type": "message",
+        "label": "추가문의",
+        "text": "추가문의",
+        "postback":"C00-H200003",
+      },
+      "bounds": {
+        "x": 1250,
+        "y": 843,
+        "width": 1250,
+        "height": 843
+      }
+    }
+  ],
+  "size": {
+    "width": 2500,
+    "height": 1686
+  }
 
 };
 
+
+
+payload["modifyRichMenu_Get"] = {};
+payload["modifyRichMenu_Delete"] = {};
+payload["appendRichMenuImage_Get"] = {};
 payload["appendRichMenuImage_Post"] = {
-    "fileId": "kr1.1657777541597561865.1657863941.1.3904290.0.0.0"
+    "fileId": "kr1.1664846821306001959.1664933221.1.3000497.0.0.0"
 };
 
 

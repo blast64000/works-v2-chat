@@ -194,7 +194,7 @@ app.post("/hero", wraper(async (req, res, next) => {
         const { headers, body } = req;
         console.log(headers);
         console.log(body);
-        let answerObj = await hero.vaildateMessage(req, contentInstList, botInstList, actionInstList);
+        let answerObj = await hero.vaildateMessage(req, contentInstList, botInstList, actionInstList,saleInstList);
         let retMsg = await hero.responseBotMsg(answerObj, baseHeaders);
 
         logreturn = await hero.json2Text(headers, body);

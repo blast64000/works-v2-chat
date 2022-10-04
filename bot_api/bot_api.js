@@ -15,7 +15,6 @@ let baseHeaders={
 };
 
 
-
 const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
     if(err) throw err;
@@ -25,13 +24,15 @@ const Main = async function (){
       baseURL: 'https://www.worksapis.com/v1.0/',
       headers: baseHeaders,
       timeout: 3000});
-
-
-    modifyBot("GET",`${options.it_bot}`,{botName:"IT운영팀 챗봇"});
-    //sendDirectMsg("하하하하","stevelight88@hanall.co.kr",0);
+    //sendDirectMsg("하하하하","mjha026@daewoong.co.kr",0);
+    //sendDirectMsg("하하하하","jsjang303@daewoong.co.kr",0);
+    //sendDirectMsg("하하하하","yjlee230@daewoong.co.kr",0);
+    //get_users_email("jwkim023@daewoong.co.kr")
+    //modifyBot("GET",`${options.it_bot}`,{botName:"IT운영팀 챗봇"});
     
-    //modifyBotUser("GET","3904290","21342","jyyoon426@daewoong.co.kr");
-    //modifyBotUser("POST","3904290","21342","changwolf@daewoong.co.kr");
+    
+    //get_users_email("stevelight88@hanall.co.kr")
+    //modifyBotUser("POST","3000497","21342","jechoi362@daewoong.co.kr");
     
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
     
@@ -39,17 +40,14 @@ const Main = async function (){
     //addBot("GET");
 
     //리치메뉴 등록 세트
-
     //modifyRichMenu("DELETE","3873810","144430")
-    //addRichMenu("GET","3873810");  //144383
-    //enrollfileLink("3904290","fexu_2500_843.png");
-    //uploadfile("fexu_2500_843.png",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1657777541597561865.1657863941.1.3904290.0.0.0/fexu_2500_843.png`);
-    //appendRichMenuImage("POST","3904290",'144526'); 
-
-
-    //addRichMenu("GET","3812571");
+    //enrollfileLink("3000497","hero_2500_1686.jpg");
+    //addRichMenu("POST","3000497","addRichMenu_Post_hero");  //144383
+    //uploadfile("hero_2500_1686.jpg",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1664846821306001959.1664933221.1.3000497.0.0.0/hero_2500_1686.jpg`);
+    //appendRichMenuImage("POST","3000497",'232231'); 
+    //addRichMenu("GET","3000497");
+    //modifyBot("PATCH",`${options.hero_bot}`,{defaultRichmenuId:"232231"});
    //modifyDomain("PUT","3812571","210997");
-
     })
 }
 
@@ -98,7 +96,7 @@ let enrollfileLink = async function(botId,fn){
 };
 
 //POST : 리치메뉴 등록, GET : 리치메뉴 조회
-let addRichMenu = async function (rest,botId) {
+let addRichMenu = async function (rest,botId,postObjName) {
   let apiFunc = {};
   try {
     switch (rest) {
@@ -106,7 +104,7 @@ let addRichMenu = async function (rest,botId) {
         apiFunc = await reqConfig.get(`/bots/${botId}/richmenus`, pay.addRichMenu_Get);
         break;
       case "POST":
-        apiFunc = await reqConfig.post(`/bots/${botId}/richmenus`, pay.addRichMenu_Post);
+        apiFunc = await reqConfig.post(`/bots/${botId}/richmenus`, pay[postObjName]);
         break;
 
       default:
