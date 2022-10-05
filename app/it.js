@@ -2,6 +2,12 @@ const fs = require("fs");
 const axios = require("axios");
 const path = require("path");
 
+/*구글시트 API*/
+const { GoogleSpreadsheet } = require("google-spreadsheet");
+const creds = require("./authentic-root-361007-2371ff5d6b9c.json"); // 키 생성 후 다운된 json파일을 지정합니다.
+const doc = new GoogleSpreadsheet('1mZOvSGZm6a7Fqh8GBuchaNzNEKw4KrBU2_Cz-nz6Lqo');
+
+
 
 let isVaildBot = function (worksBotNo, botInstList) {
     for (bi of botInstList) {
@@ -210,7 +216,34 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
                 resolve(retArray)
 
                 break;
+            case "inbound":
 
+            
+                resolve([
+                    {
+                    botId:"3904293",
+                    userId:"jwkim023@daewoong.co.kr",
+                    isInbound : true,
+                    json:{
+                        content: {
+                            type: 'text',
+                            text:'it.js:229'
+                          }
+                        }
+                    },
+                    {
+                        botId:"3904293",
+                        userId:"pys1210@daewoong.co.kr",
+                        isInbound : true,
+                        json:{
+                            content: {
+                                type: 'text',
+                                text:`err can't read google drive`
+                              }
+                            }
+                        }
+            ])
+        
             default:
                 resolve([0]);
                 break;
@@ -222,32 +255,8 @@ const vaildateMessage = function (req, contentInstList,botInstList,actionInstLis
 }
 
 let responseBotMsg = async function (objArray,baseHeaders) {
-
-
     console.log(objArray);
-    /*  Thumbs up tailing
-    obj[obj.length - 1].json.content.quickReply ={
-        "items": [
-          {
-            "imageUrl": "https://illustoon.com/photo/4292.png",
-            "action": {
-              "type": "message",
-              "label": "좋아요",
-              "text": "좋아요"
-            }
-          },
-          {
-            "imageUrl": "https://illustoon.com/photo/211.png",
-            "action": {
-              "type": "message",
-              "label": "뒤로가기",
-              "text": "뒤로가기",
-              "postback":"C00-F10000"
-            }
-          }
-        ]
-      }
-      */
+
 
     let reqConfig = axios.create({
         baseURL: `https://www.worksapis.com/v1.0/bots/`,
@@ -257,10 +266,34 @@ let responseBotMsg = async function (objArray,baseHeaders) {
     //test
 
     for await (let ti of objArray) {
-        if (ti === 0) { continue };
+        console.log(ti);
+        if (ti === 0) { continue }
+
+        else if(ti.isInbound){
+            let bodyDetail = ``;
+            doc.useServiceAccountAuth(creds);
+            await doc.loadInfo();
+            // console.log(doc);
+            const sheet = doc.sheetsByIndex[0]; doc.sheetsByTitle[doc.title]
+            const rows = await sheet.getRows();
+            const newObj = rows[rows.length-1];
+            //javascript backtick
+            bodyDetail = `안녕하세요. 나보타X브이올렛 카카오톡 챗봇에 새로운 문의 내역이 저장되었습니다.
+            \n\n ✔ 저장시각: ${newObj._rawData[0].slice(0, -3)}
+            \n ✔ 병원명: ${newObj._rawData[1]}
+            \n ✔ 닥터명: ${newObj._rawData[2]}
+            \n ✔ 전화번호: ${newObj._rawData[3]}
+            \n ✔ 이메일주소:  ${newObj._rawData[4]}
+            \n ✔ 문의 사항: ${newObj._rawData[5]}
+            \n ✔ 개인정보 동의 여부: ${newObj._rawData[6]}
+            \n\n 좋은 하루 보내세요. 감사합니다.`
+            ti.json.content.text = bodyDetail;
+        }
+
+
         let startTime = 0;
         let endTime = 0;
-
+        console.log(ti);
         startTime = new Date().getTime();
         apiFunc = await reqConfig.post(`${ti.botId}/users/${ti.userId}/messages`, ti.json);
         endTime = new Date().getTime();
@@ -269,7 +302,6 @@ let responseBotMsg = async function (objArray,baseHeaders) {
             (endTime - startTime) > 0 ? (1000 - (endTime - startTime)) : 10));
     }
 };
-
 
 
 let makeLogName = function () {
