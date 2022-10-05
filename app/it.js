@@ -4,8 +4,8 @@ const path = require("path");
 
 /*구글시트 API*/
 const { GoogleSpreadsheet } = require("google-spreadsheet");
-const creds = require("./authentic-root-361007-2371ff5d6b9c.json"); // 키 생성 후 다운된 json파일을 지정합니다.
-const doc = new GoogleSpreadsheet('1mZOvSGZm6a7Fqh8GBuchaNzNEKw4KrBU2_Cz-nz6Lqo');
+const creds = require("./nabota-v-olet-chat-de1200fdd4b4.json"); // 키 생성 후 다운된 json파일을 지정합니다.
+const doc = new GoogleSpreadsheet('1LyaKIhK7Fb6FkWxYAIeZ7r9dRIoco3vAQ3JJjKSLJt8');
 
 
 
