@@ -2,7 +2,7 @@ const fs = require("fs");
 const axios = require("axios");
 const path = require("path");
 const options = require("../options.js");
-
+const execSync = require("child_process").execSync;
 let my_car = require("./hero.json");
 
 let isVaildBot = function (worksBotNo, botInstList) {
@@ -236,8 +236,10 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                             }
 
                             if (retArray.length === 0) {
-                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: "필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #핼프) \n 메인화면으로 돌아갑니다." }))
-                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
+                                const result = execSync(`python /home/ubuntu/works-v2-chat/python/chatbot.py ${body.content.text}`);
+                                // convert and show the output.
+                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: result.toString("utf8") }))
+//                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
                                 resolve(retArray);
                             }
                         }
