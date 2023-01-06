@@ -236,10 +236,9 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                             }
 
                             if (retArray.length === 0) {
-                                const result = execSync(`python /home/ubuntu/works-v2-chat/python/chatbot.py ${body.content.text}`);
-                                // convert and show the output.
-                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: result.toString("utf8") }))
-//                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
+                                //python request 필요
+                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: "필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #핼프) \n 메인화면으로 돌아갑니다." }))
+                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
                                 resolve(retArray);
                             }
                         }

@@ -3,7 +3,7 @@ let payload = {};
 payload["refresh"]={
   "content": {
     "type": "text",
-    "text": "token refresh"
+    "text": "그룹전송 테스트입니다."
   }
 }
 
@@ -332,11 +332,10 @@ payload["init_force"] = {
 
     "content": {
       "type": "button_template",
-      "contentText": "안녕하세요 영웅톡 챗봇입니다.\n 사전 테스트를 시작합니다",
+      "contentText": `영웅톡 시작하기`,
       "actions": [{
         "type": "message",
-        "label": "시작하기",
-        "postback": "c100-50001"
+        "label": "안녕",
       }]
     }
 }

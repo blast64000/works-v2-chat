@@ -14,25 +14,51 @@ let baseHeaders={
     "Content-Type": `application/json`
 };
 
+let emailArray = ["jwkim023@daewoong.co.kr",
+  "spjin@daewoong.co.kr", "2210309@daewoong.co.kr",
+  "2220422@daewoong.co.kr", "hyyeo432@daewoong.co.kr",
+  "smlee193@daewoong.co.kr",  "yeson060@daewoong.co.kr",
+  "jylee289@daewoong.co.kr",  "swkim124@daewoong.co.kr",
+  "hhh80@daewoong.co.kr",  "2220216@daewoong.co.kr",
+  "hkkim194@daewoong.co.kr",  "9501003@daewoong.co.kr",
+  "2060223@daewoong.co.kr",  "sgw0909@daewoong.co.kr",
+  "shpark187@daewoong.co.kr",  "cho8573@daewoong.co.kr",
+  "2100238@daewoong.co.kr",  "csb0810@daewoong.co.kr",
+  "ihkang180@daewoong.co.kr",  "lomisove@daewoong.co.kr",
+  "hunsang@daewoong.co.kr",  "sunnypt@daewoong.co.kr",
+  "hyunmi75@daewoong.co.kr",  "xfactor21@daewoong.co.kr",
+  "2160239@daewoong.co.kr",  "jhhwang523@daewoong.co.kr",
+  "sw561@daewoong.co.kr",  "mjkim091@daewoong.co.kr",
+  "brhan@daewoong.co.kr",  "sbchoi189@daewoong.co.kr",
+  "vnananav@daewoong.co.kr", "2210381@daewoong.co.kr",
+  "ipomi74@daewoong.co.kr",  "2220243@daewoong.co.kr",
+  "2220625@daewoong.co.kr",  "siyoon@daewoong.co.kr","jwkim023@daewoong.co.kr"];
+
+
 
 const Main = async function (){
   fs.readFile('../books.txt',(err,data)=>{
     if(err) throw err;
     baseHeaders.Authorization += JSON.parse(data).access_token;
-
     reqConfig = axios.create({
       baseURL: 'https://www.worksapis.com/v1.0/',
       headers: baseHeaders,
       timeout: 3000});
-    //sendDirectMsg("하하하하","mjha026@daewoong.co.kr",0);
+
+    //console.log(emailArray.length);
+    modifyBotUser("POST",options.hero_bot,"21342","2230012@daewoong.co.kr");
+    sendDirectMsg("대화를 시작해봐요","2230012@daewoong.co.kr",1,options.hero_bot);
+    //get_users_email("whcho@pharmpack.co.kr");
+    
+    
     //sendDirectMsg("하하하하","jsjang303@daewoong.co.kr",0);
     //sendDirectMsg("하하하하","yjlee230@daewoong.co.kr",0);
-    //get_users_email("jwkim023@daewoong.co.kr")
+    //get_users_email("6210301@daewoong.co.kr");
     //modifyBot("GET",`${options.it_bot}`,{botName:"IT운영팀 챗봇"});
     
     
     //get_users_email("stevelight88@hanall.co.kr")
-    //modifyBotUser("POST","3000497","21342","jechoi362@daewoong.co.kr");
+    
     
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
     
@@ -51,13 +77,13 @@ const Main = async function (){
     })
 }
 
-const sendDirectMsg = async function(msg,userId,isInit){
+const sendDirectMsg = async function(msg,userId,isInit,botId){
 
   reqConfig2 = axios.create({
     baseURL: 'https://www.worksapis.com/v1.0/bots/',
     headers: baseHeaders,
     timeout: 3000});
-      apiFunc = await reqConfig2.post(`${options.hero_bot}/users/${userId}/messages`, (isInit? pay["init_force"]:pay["refresh"]));
+      apiFunc = await reqConfig2.post(`${botId}/users/${userId}/messages`, (isInit? pay["init_force"]:pay["refresh"]));
   }
 
 
