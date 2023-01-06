@@ -236,6 +236,7 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                             }
 
                             if (retArray.length === 0) {
+                                //python request 필요
                                 retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: "필요한 내용 검색을 위해서는 #을 붙여주세요 (ex> #핼프) \n 메인화면으로 돌아갑니다." }))
                                 retArray.push(makeAnswerJson(headers["x-works-botid"], body, findCurrCont(botInst.botStartCode, contentInstList)))
                                 resolve(retArray);

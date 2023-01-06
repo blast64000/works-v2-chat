@@ -146,6 +146,7 @@ app.post("*", wraper(async (req, res, next) => {
     }
 }));
 
+
 app.post("/it", wraper(async (req, res, next) => {
     try {
         const { headers, body } = req;
@@ -186,6 +187,27 @@ app.post("/fexu", wraper(async (req, res, next) => {
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
 }));
 
+
+app.post("/hr", wraper(async (req, res, next) => {
+    try {
+        const { headers, body } = req;
+        console.log(headers);
+        console.log(body);
+        let answerObj = await fexu.vaildateMessage(req, contentInstList, botInstList, actionInstList);
+        let retMsg = await fexu.responseBotMsg(answerObj, baseHeaders);
+
+        logreturn = await fexu.json2Text(headers, body);
+        if (logreturn) {
+            fexu.log2csv(logreturn, __dirname);
+        }
+
+    } catch (err) {
+        console.log(Object.getOwnPropertyNames(err))
+    }
+    // 데이터 전송
+    //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
+}));
+
 app.post("/hero", wraper(async (req, res, next) => {
     try {
         const { headers, body } = req;
@@ -207,8 +229,6 @@ app.post("/hero", wraper(async (req, res, next) => {
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
 }));
-
-
 
 
 app.get("/botImgFile/*", function (req, res) {
