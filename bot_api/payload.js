@@ -332,7 +332,7 @@ payload["init_force"] = {
 
     "content": {
       "type": "button_template",
-      "contentText": `영웅톡 시작하기`,
+      "contentText": `인사챗봇 시작하기`,
       "actions": [{
         "type": "message",
         "label": "안녕",

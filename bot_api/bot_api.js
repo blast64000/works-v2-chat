@@ -14,29 +14,58 @@ let baseHeaders={
     "Content-Type": `application/json`
 };
 
-let emailArray = ["jwkim023@daewoong.co.kr",
-  "spjin@daewoong.co.kr", "2210309@daewoong.co.kr",
-  "2220422@daewoong.co.kr", "hyyeo432@daewoong.co.kr",
-  "smlee193@daewoong.co.kr",  "yeson060@daewoong.co.kr",
-  "jylee289@daewoong.co.kr",  "swkim124@daewoong.co.kr",
-  "hhh80@daewoong.co.kr",  "2220216@daewoong.co.kr",
-  "hkkim194@daewoong.co.kr",  "9501003@daewoong.co.kr",
-  "2060223@daewoong.co.kr",  "sgw0909@daewoong.co.kr",
-  "shpark187@daewoong.co.kr",  "cho8573@daewoong.co.kr",
-  "2100238@daewoong.co.kr",  "csb0810@daewoong.co.kr",
-  "ihkang180@daewoong.co.kr",  "lomisove@daewoong.co.kr",
-  "hunsang@daewoong.co.kr",  "sunnypt@daewoong.co.kr",
-  "hyunmi75@daewoong.co.kr",  "xfactor21@daewoong.co.kr",
-  "2160239@daewoong.co.kr",  "jhhwang523@daewoong.co.kr",
-  "sw561@daewoong.co.kr",  "mjkim091@daewoong.co.kr",
-  "brhan@daewoong.co.kr",  "sbchoi189@daewoong.co.kr",
-  "vnananav@daewoong.co.kr", "2210381@daewoong.co.kr",
-  "ipomi74@daewoong.co.kr",  "2220243@daewoong.co.kr",
-  "2220625@daewoong.co.kr",  "siyoon@daewoong.co.kr","jwkim023@daewoong.co.kr"];
+//let emailArray = ["jwkim023@daewoong.co.kr","changwolf@daewoong.co.kr","pys1210@daewoong.co.kr","yjlee230@daewoong.co.kr","jsjang303@daewoong.co.kr","mjha026@daewoong.co.kr","2230015@daewoong.co.kr","2210381@daewoong.co.kr","anmin33@daewoong.co.kr","pyh@daewoong.co.kr","2210493@daewoong.co.kr","2210432@daewoong.co.kr","hjlee301@daewoong.co.kr","2230012@daewoong.co.kr","jwkim023@daewoong.co.kr"];
+let emailArray = ["jwkim023@daewoong.co.kr"]
+  msgObj={
+    "content": {
+      "type": "text",
+      "text": `[챗봇 단체 메세지 베타 테스트] \n안녕하세요 오늘부로 Wifi 비밀번호가 변경됩니다. \n 비밀번호 확인하시어 업무에 참고하시기 바랍니다.\n 팁 : #wifi를 검색하시면 쉽게 확인가능\n
+[DW_Main]
+C@@H24276
 
+[DW_FMC_5G]
+C@@H24276
 
+[DW_FMC_2.4G]
+C@@H24276
+
+[DW_Guest]
+DW##29644
+      `
+    }
+  }
+  imgObj = {
+    "content": {
+        "type": "image",
+        "previewImageUrl": "https://chat.daewoong.co.kr/botImgFile/wifi_23_01.png",
+        "originalContentUrl": "https://chat.daewoong.co.kr/botImgFile/wifi_23_01.png"
+    }
+}
+
+  function sleep(ms) {
+    const wakeUpTime = Date.now() + ms;
+    while (Date.now() < wakeUpTime) {}
+  }
+
+  const Main2 = async function (){
+    const fileRes = await fs.readFileSync('../books.txt', { encoding: 'utf8', flag: 'r' });
+    baseHeaders.Authorization += JSON.parse(fileRes).access_token;
+
+    for await (let ti of emailArray){
+
+    reqConfig2 = axios.create({
+      baseURL: 'https://www.worksapis.com/v1.0/bots/',
+      headers: baseHeaders,
+      timeout: 3000});
+
+      await reqConfig2.post(`${options.hr_bot}/users/${ti}/messages`,msgObj);
+      await reqConfig2.post(`${options.hr_bot}/users/${ti}/messages`,imgObj);
+    }
+  }
 
 const Main = async function (){
+
+
   fs.readFile('../books.txt',(err,data)=>{
     if(err) throw err;
     baseHeaders.Authorization += JSON.parse(data).access_token;
@@ -46,8 +75,8 @@ const Main = async function (){
       timeout: 3000});
 
     //console.log(emailArray.length);
-    modifyBotUser("POST",options.hero_bot,"21342","2230012@daewoong.co.kr");
-    sendDirectMsg("대화를 시작해봐요","2230012@daewoong.co.kr",1,options.hero_bot);
+    modifyBotUser("POST",options.hr_bot,"21342","2220141@daewoong.co.kr");
+    sendDirectMsg("대화를 시작해봐요","2220141@daewoong.co.kr",1,options.hr_bot);
     //get_users_email("whcho@pharmpack.co.kr");
     
     
@@ -392,4 +421,5 @@ let modifyBotUser = async function (rest, botId, domainId,userId) {
 // GET/bots/{botId}/persistentmenu
 // DELETE/bots/{botId}/persistentmenu
 
+//Main();    
 Main();
