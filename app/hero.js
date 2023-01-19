@@ -110,6 +110,7 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj,sales_list) {
                     }
                 }
             }
+        
 
             if(isSale){
             retObj.json.content.type = "flex";
@@ -209,6 +210,8 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                     }
                     resolve(retArray)
                 }
+
+
                 //단순 텍스트 입력인 경우 
                 else if (body.content.type === "text") {
                     if (botInst) {
@@ -364,21 +367,16 @@ let json2Text = function (headers, body) {
             } else {
                 retString += ` `
             }
-
-
         } else {
             retString += ` , , `
         }
-
-
-
+        
         if (retString === "") {
             reject("");
         } else {
             console.log(retString);
             resolve(retString);
         }
-
     });
 }
 
@@ -401,6 +399,7 @@ let log2csv = function (inpString, dirName) {
     }
 
 };
+
 
 
 

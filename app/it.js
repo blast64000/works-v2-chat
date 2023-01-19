@@ -7,9 +7,9 @@ const options = require("../options.js");
 const request = require('request');
 
 /*구글시트 API*/
-const { GoogleSpreadsheet } = require("google-spreadsheet");
-const creds = require("./nabota-v-olet-chat-de1200fdd4b4.json"); // 키 생성 후 다운된 json파일을 지정합니다.
-const doc = new GoogleSpreadsheet('1LyaKIhK7Fb6FkWxYAIeZ7r9dRIoco3vAQ3JJjKSLJt8');
+//const { GoogleSpreadsheet } = require("google-spreadsheet");
+//const creds = require("./nabota-v-olet-chat-de1200fdd4b4.json"); // 키 생성 후 다운된 json파일을 지정합니다.
+//const doc = new GoogleSpreadsheet('1LyaKIhK7Fb6FkWxYAIeZ7r9dRIoco3vAQ3JJjKSLJt8');
 
 
 
