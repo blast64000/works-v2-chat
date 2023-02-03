@@ -224,6 +224,7 @@ app.post("/hero", wraper(async (req, res, next) => {
     } catch (err) {
         console.log(Object.getOwnPropertyNames(err))
         console.log(err.message);
+        console.log(err)
         
     }
     // 데이터 전송

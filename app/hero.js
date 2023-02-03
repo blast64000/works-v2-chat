@@ -89,6 +89,8 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj,sales_list) {
             retObj.json.content.columns = contObj.outArray;
             return retObj;
             break;
+
+
         case "file":
             retObj.json.content.type = contObj.contType;
             retObj.json.content.originalContentUrl = contObj.contPreImg;
@@ -181,6 +183,11 @@ let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
     return retobj;
 
 };
+
+
+
+
+
 
 
 const vaildateMessage = function (req, contentInstList, botInstList, actionInstList,sales_list) {

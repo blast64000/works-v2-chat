@@ -332,7 +332,7 @@ payload["init_force"] = {
 
     "content": {
       "type": "button_template",
-      "contentText": `인사챗봇 시작하기`,
+      "contentText": `영웅톡 챗봇 시작하기`,
       "actions": [{
         "type": "message",
         "label": "안녕",
@@ -541,20 +541,20 @@ payload["addRichMenu_Post_hero"] = {
   "richmenuName": "영웅톡 v3",
   "areas": [
     //1.메인화면
-    {
-      "action": {
-        "type": "message",
-        "label": "메인화면★",
-        "text": "메인화면★",
-        "postback ":"C00-H100004"
-      },
-      "bounds": {
-        "x": 0,
-        "y": 0,
-        "width": 2,
-        "height": 2
-      }
-    },
+    // {
+    //   "action": {
+    //     "type": "message",
+    //     "label": "메인화면★",
+    //     "text": "메인화면★",
+    //     "postback ":"C00-H100004"
+    //   },
+    //   "bounds": {
+    //     "x": 0,
+    //     "y": 0,
+    //     "width": 2,
+    //     "height": 2
+    //   }
+    // },
     {
       "action": {
         "type": "message",

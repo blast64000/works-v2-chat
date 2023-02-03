@@ -7,8 +7,6 @@ const FormData = require('form-data');
 const request = require('request');
 let options = require("../options.js")
 
-
-
 let baseHeaders={
   'Authorization': "Bearer ",
     "Content-Type": `application/json`
@@ -75,9 +73,10 @@ const Main = async function (){
       timeout: 3000});
 
     //console.log(emailArray.length);
-    modifyBotUser("POST",options.hr_bot,"21342","2220141@daewoong.co.kr");
-    sendDirectMsg("대화를 시작해봐요","2220141@daewoong.co.kr",1,options.hr_bot);
-    //get_users_email("whcho@pharmpack.co.kr");
+    // modifyBotUser("POST",options.hero_bot,"21342","thlee310@daewoong.co.kr");    // 대화상대 추가 (이메일, options.   _bot 만 변경)
+    // sendDirectMsg("대화를 시작해봐요","thlee310@daewoong.co.kr",1,options.hero_bot);    // 대화상대 추가 (이메일, options.   _bot 만 변경)
+  
+    // get_users_email("whcho@pharmpack.co.kr");
     
     
     //sendDirectMsg("하하하하","jsjang303@daewoong.co.kr",0);
@@ -86,7 +85,7 @@ const Main = async function (){
     //modifyBot("GET",`${options.it_bot}`,{botName:"IT운영팀 챗봇"});
     
     
-    //get_users_email("stevelight88@hanall.co.kr")
+    // get_users_email("788bc85a-ecaf-4d31-1c03-037779cd927b")
     
     
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
