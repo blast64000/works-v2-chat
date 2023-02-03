@@ -5,7 +5,7 @@ const path = require("path");
 const { exit } = require("process");
 const options = require("../options.js");
 const request = require('request');
-
+const { Configuration, OpenAIApi } = require("openai");
 /*구글시트 API*/
 //const { GoogleSpreadsheet } = require("google-spreadsheet");
 //const creds = require("./nabota-v-olet-chat-de1200fdd4b4.json"); // 키 생성 후 다운된 json파일을 지정합니다.
@@ -233,7 +233,7 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
 
 let responseBotMsg = async function (objArray, baseHeaders) {
     console.log(objArray);
-
+    const DAVINCI_TOKEN_MAX_LENGTH = 2048;
 
     let reqConfig = axios.create({
         baseURL: `https://www.worksapis.com/v1.0/bots/`,
@@ -243,6 +243,7 @@ let responseBotMsg = async function (objArray, baseHeaders) {
     //test
 
     for await (let ti of objArray) {
+        try{
         console.log(ti);
         if (ti === 0) { continue }
         else if (ti.isInbound) {
@@ -266,26 +267,46 @@ let responseBotMsg = async function (objArray, baseHeaders) {
             ti.json.content.text = bodyDetail;
         }
         else if (ti.isNLP) {
+            const configuration = new Configuration({
+                apiKey: options.open_api_key,
+            });
+            const openai = new OpenAIApi(configuration);
+
+                console.log(ti.json.content.text);
+                console.log(ti.json.content.text.split(" ").filter(x=>x!=""));
+                console.log(ti.json.content.text.split(" ").filter(x=>x!="").length);
+
+                const response = await openai.createCompletion({
+                    "model": "text-davinci-003",
+                    "prompt": ti.json.content.text,
+                    "temperature": 0.9,
+                    "max_tokens": 2048,
+                });
+    
+                console.log(response.data);
+                console.log(response.data.choices);
+                ti.json.content.text=response.data.choices[0].text
+    
+
+
+
             
-            let answer = await requestNLP(ti.json.content.text);
-            let answerObj = JSON.parse(answer);
-            console.log(answerObj);
-            if(answerObj.return_object.WiKiInfo.AnswerInfo.length>0){
-            ti.json.content.text = `정답 : ${answerObj.return_object.WiKiInfo.AnswerInfo[0].answer}\n 정확도 : ${answerObj.return_object.WiKiInfo.AnswerInfo[0].rank}`
-            } else { 
-                ti.json.content.text=`잘 모르겠어요 데헷 >_< `
-            }
-        }        
+
+        }
 
         let startTime = 0;
         let endTime = 0;
-        
+
         startTime = new Date().getTime();
         apiFunc = await reqConfig.post(`${ti.botId}/users/${ti.userId}/messages`, ti.json);
         endTime = new Date().getTime();
         console.log(endTime - startTime);
         await new Promise(resolve => setTimeout(resolve,
             (endTime - startTime) > 0 ? (1000 - (endTime - startTime)) : 10));
+        } catch(err){
+            console.log("error:");
+            console.log(err);
+        }
     }
 };
 
@@ -296,15 +317,12 @@ let makeLogName = function () {
     return yourDate.toISOString().split('T')[0]
 };
 
-
 //concept : json 으로 작성하고 key repalce 후 csv 형식으로 작성하는것으로 변경 
 const writeJson = function (headers, body) {
-
 }
 
 
 let json2Text = function (headers, body) {
-
     return new Promise((resolve, reject) => {
         let retString = "";
         if (headers["x-works-botid"]) {
@@ -424,7 +442,7 @@ let requestNLP = function (myquestion) {
         };
         request.post(options, function (error, response, body) {
             console.log('responseCode = ' + response.statusCode);
-            if(response.statusCode===200){
+            if (response.statusCode === 200) {
                 resolve(body);
             }
         });
