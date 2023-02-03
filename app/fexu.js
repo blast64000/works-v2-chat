@@ -29,8 +29,6 @@ let findCurrCont = function (postback, conList) {
 let makeAnswerJson = function (worksBotId, reqbody, contObj) {
 
     if(!contObj) {return 0}
-    
-
     let retObj = {
         botId: worksBotId,
         userId: reqbody.source.userId,

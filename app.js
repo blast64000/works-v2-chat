@@ -17,6 +17,7 @@ const lklist = require("./ln-list.js");
 const hero = require("./app/hero");
 const fexu = require("./app/fexu.js");
 const it = require("./app/it.js");
+const hr = require("./app/hr.js");
 
 
 const app = express()
@@ -193,12 +194,12 @@ app.post("/hr", wraper(async (req, res, next) => {
         const { headers, body } = req;
         console.log(headers);
         console.log(body);
-        let answerObj = await fexu.vaildateMessage(req, contentInstList, botInstList, actionInstList);
-        let retMsg = await fexu.responseBotMsg(answerObj, baseHeaders);
+        let answerObj = await hr.vaildateMessage(req, contentInstList, botInstList, actionInstList);
+        let retMsg = await hr.responseBotMsg(answerObj, baseHeaders);
 
-        logreturn = await fexu.json2Text(headers, body);
+        logreturn = await hr.json2Text(headers, body);
         if (logreturn) {
-            fexu.log2csv(logreturn, __dirname);
+            hr.log2csv(logreturn, __dirname);
         }
 
     } catch (err) {
