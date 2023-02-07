@@ -26,7 +26,7 @@ let findCurrCont = function (postback, conList) {
     }
 };
 
-let makeAnswerJson = function (worksBotId, reqbody, contObj,sales_list) {
+let makeAnswerJson = function (worksBotId, reqbody, contObj, sales_list) {
 
     if (!contObj) { return 0 }
 
@@ -67,7 +67,6 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj,sales_list) {
                         label: qi.actName,
                         postback: qi.nextContCode
                     })
-
                 } else {
 
                     if (options[qi.actIdentCode] === reqbody.source.domainId) {
@@ -90,55 +89,78 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj,sales_list) {
             return retObj;
             break;
 
-
         case "file":
             retObj.json.content.type = contObj.contType;
             retObj.json.content.originalContentUrl = contObj.contPreImg;
             return retObj;
             break;
 
+        case "image_carousel":
+            console.log(contObj);
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.columns=[];
+            for ( let ic of contObj.contActionSet){
+                if (ic.actIdentCode === "*") {
+                    retObj.json.content.columns.push(
+                        {
+                            "originalContentUrl":ic.actImgUrl,
+                            "action":{  
+                                "type":ic.actType,
+                                "label":ic.actName,
+                                "text":ic.actName,
+                                "postback": ic.nextContCode
+                            }
+                        }
+                    )
+                } 
+                else { 
+                    console.log("enter image_carousel_else");
+                }
+            }
+            console.log(retObj.json.content);
+            return retObj;
+      
+            break;
 
         case "db_access":
             let isSale = false;
-            for ( xi of sales_list){
-                if(xi.SALE_DATE.addHours(9).toISOString().substring(0,7)===(new Date().addHours(9).toISOString().substring(0,7))){
-                    if(reqbody.source.userId===xi.SALE_EX_KEY){
-                        isSale=true;
+            for (xi of sales_list) {
+                if (xi.SALE_DATE.addHours(9).toISOString().substring(0, 7) === (new Date().addHours(9).toISOString().substring(0, 7))) {
+                    if (reqbody.source.userId === xi.SALE_EX_KEY) {
+                        isSale = true;
                         my_car.body.contents[0].text = `${xi.SALE_NAME}님 실적`
-                        my_car.body.contents[1].text = new Date().toISOString().substring(0,7)
+                        my_car.body.contents[1].text = new Date().toISOString().substring(0, 7)
                         my_car.body.contents[3].contents[1].text = `${xi.SALE_GROUND.toLocaleString()}`
-                        my_car.body.contents[4].contents[1].text=`${xi.SALE_UP_AMT.toLocaleString()}`
-                        my_car.body.contents[6].contents[1].contents[1].text=`${xi.SALE_FINAL.toLocaleString()}`
+                        my_car.body.contents[4].contents[1].text = `${xi.SALE_UP_AMT.toLocaleString()}`
+                        my_car.body.contents[6].contents[1].contents[1].text = `${xi.SALE_FINAL.toLocaleString()}`
                     }
                 }
             }
-        
 
-            if(isSale){
-            retObj.json.content.type = "flex";
-            retObj.json.content.altText = "DB ACCESS 예시";
-            retObj.json.content.contents = my_car;
-            retObj.dbflag=true;
-            return retObj;
-            } 
-            else {
-                retObj.json.content.type = "text";
-                retObj.json.content.text = "실적 결과가 없습니다";    
+            if (isSale) {
+                retObj.json.content.type = "flex";
+                retObj.json.content.altText = "DB ACCESS 예시";
+                retObj.json.content.contents = my_car;
+                retObj.dbflag = true;
                 return retObj;
             }
-
+            else {
+                retObj.json.content.type = "text";
+                retObj.json.content.text = "실적 결과가 없습니다";
+                return retObj;
+            }
             break;
         default:
             return {};
     }
 };
 
-Date.prototype.addHours= function(h){
-    this.setHours(this.getHours()+h);
+Date.prototype.addHours = function (h) {
+    this.setHours(this.getHours() + h);
     return this;
 }
 
-let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
+let hashSearch = function (inputText, actionInstList, botInst, reqbody) {
     let arrayCount = 0;
     let retobj = {
         contType: "carousel",
@@ -152,7 +174,7 @@ let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
             }
 
             else {
-                if( !(hs.actIdentCode==="*") && !(options[hs.actIdentCode]===reqbody.source.domainId)) { continue;}
+                if (!(hs.actIdentCode === "*") && !(options[hs.actIdentCode] === reqbody.source.domainId)) { continue; }
                 arrayCount++;
                 retobj.outArray.push(
                     {
@@ -190,7 +212,7 @@ let hashSearch = function (inputText, actionInstList, botInst,reqbody) {
 
 
 
-const vaildateMessage = function (req, contentInstList, botInstList, actionInstList,sales_list) {
+const vaildateMessage = function (req, contentInstList, botInstList, actionInstList, sales_list) {
     return new Promise((resolve, reject) => {
 
         retArray = []
@@ -208,16 +230,15 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
         switch (body.type) {
             case "message":
                 if (body.content.postback) {
-                    if (body.content.postback === "start") { body.content.postback = botInst.botStartCode;}
+                    if (body.content.postback === "start") { body.content.postback = botInst.botStartCode; }
                     let pbCountList = body.content.postback.split(",");
                     for (let xi of pbCountList) {
                         retArray.push(
-                            makeAnswerJson(headers["x-works-botid"], body, findCurrCont(xi.trim(), contentInstList),sales_list)
+                            makeAnswerJson(headers["x-works-botid"], body, findCurrCont(xi.trim(), contentInstList), sales_list)
                         )
                     }
                     resolve(retArray)
                 }
-
 
                 //단순 텍스트 입력인 경우 
                 else if (body.content.type === "text") {
@@ -377,7 +398,7 @@ let json2Text = function (headers, body) {
         } else {
             retString += ` , , `
         }
-        
+
         if (retString === "") {
             reject("");
         } else {

@@ -37,6 +37,7 @@ let ActNode = class {
         this.nextContCode = data.ACT_CONT_CD;
         this.actIdentCode = data.ACT_IDENT_CD;
         this.actkeyWord = data.ACT_KWD;
+        this.actImgUrl = data.ACT_IMG_URL;
         this.nextNode = null;
     }
     
