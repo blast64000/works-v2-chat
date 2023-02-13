@@ -333,10 +333,12 @@ payload["init_force"] = {
     "content": {
       "type": "button_template",
       "contentText": `영웅톡 챗봇 시작하기`,
-      "actions": [{
+      "actions": [
+        {
         "type": "message",
         "label": "안녕",
-      }]
+        }
+    ]
     }
 }
 
@@ -538,7 +540,7 @@ payload["addRichMenu_Post_fexu"] = {
 //영웅톡 2500 x 1686
 payload["addRichMenu_Post_hero"] = {
 
-  "richmenuName": "영웅톡 v3",
+  "richmenuName": "영웅톡 v5",
   "areas": [
     //1.메인화면
     // {
@@ -626,7 +628,7 @@ payload["modifyRichMenu_Get"] = {};
 payload["modifyRichMenu_Delete"] = {};
 payload["appendRichMenuImage_Get"] = {};
 payload["appendRichMenuImage_Post"] = {
-    "fileId": "kr1.1664846821306001959.1664933221.1.3000497.0.0.0"
+    "fileId": "kr1.1676246886941162546.1676333286.1.3000497.0.0.0"
 };
 
 

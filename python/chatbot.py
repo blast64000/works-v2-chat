@@ -48,6 +48,3 @@ for arg in sys.argv[1:]:
 
 if __name__ =="__main__":
     print(tfidf_cosine_arr(doc1_list,sentence))
-
-
-

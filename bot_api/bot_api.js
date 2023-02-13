@@ -74,12 +74,12 @@ const Main = async function (){
 
     //console.log(emailArray.length);
     // modifyBotUser("POST",options.hero_bot,"21342","thlee310@daewoong.co.kr");    // 대화상대 추가 (이메일, options.   _bot 만 변경)
-    // sendDirectMsg("대화를 시작해봐요","thlee310@daewoong.co.kr",1,options.hero_bot);    // 대화상대 추가 (이메일, options.   _bot 만 변경)
+    //sendDirectMsg("대화를 시작해봐요","jwkim023@daewoong.co.kr",1,options.it_bot);    // 대화상대 추가 (이메일, options.   _bot 만 변경)
   
     // get_users_email("whcho@pharmpack.co.kr");
-    
-    
+  
     //sendDirectMsg("하하하하","jsjang303@daewoong.co.kr",0);
+  
     //sendDirectMsg("하하하하","yjlee230@daewoong.co.kr",0);
     //get_users_email("6210301@daewoong.co.kr");
     //modifyBot("GET",`${options.it_bot}`,{botName:"IT운영팀 챗봇"});
@@ -94,14 +94,15 @@ const Main = async function (){
     //addBot("GET");
 
     //리치메뉴 등록 세트
-    //modifyRichMenu("DELETE","3873810","144430")
-    //enrollfileLink("3000497","hero_2500_1686.jpg");
-    //addRichMenu("POST","3000497","addRichMenu_Post_hero");  //144383
-    //uploadfile("hero_2500_1686.jpg",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1664846821306001959.1664933221.1.3000497.0.0.0/hero_2500_1686.jpg`);
-    //appendRichMenuImage("POST","3000497",'232231'); 
-    //addRichMenu("GET","3000497");
-    //modifyBot("PATCH",`${options.hero_bot}`,{defaultRichmenuId:"232231"});
-   //modifyDomain("PUT","3812571","210997");
+    //modifyBot("GET",`${options.hero_bot}`);
+    //addRichMenu("GET",options.hero_bot);
+    //modifyRichMenu("DELETE",options.hero_bot,"146909")
+    //enrollfileLink(options.hero_bot,"richMenu_prod_005.jpg");
+    //addRichMenu("POST",options.hero_bot,"addRichMenu_Post_hero");  //144383
+    //uploadfile("richMenu_prod_005.jpg",`http://apis-storage.worksmobile.com/k/emsg/r/kr1/1676246886941162546.1676333286.1.3000497.0.0.0/richMenu_prod_005.jpg`);
+    //addRichMenu("GET",options.hero_bot);
+    //appendRichMenuImage("POST",options.hero_bot,'823298'); 
+    //modifyBot("PATCH",`${options.hero_bot}`,{defaultRichmenuId:"823298"});
     })
 }
 

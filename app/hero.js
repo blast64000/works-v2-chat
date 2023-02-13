@@ -81,6 +81,11 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj, sales_list) {
             }
             return retObj;
             break;
+        case "file":
+            retObj.json.content.type = contObj.contType;
+            retObj.json.content.originalContentUrl = contObj.contPreImg;
+            return retObj;
+            break;
 
         case "carousel":
             if (!contObj.outArray) { return 0 };
@@ -89,37 +94,46 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj, sales_list) {
             return retObj;
             break;
 
-        case "file":
-            retObj.json.content.type = contObj.contType;
-            retObj.json.content.originalContentUrl = contObj.contPreImg;
-            return retObj;
-            break;
 
         case "image_carousel":
             console.log(contObj);
             retObj.json.content.type = contObj.contType;
-            retObj.json.content.columns=[];
-            for ( let ic of contObj.contActionSet){
+            retObj.json.content.columns = [];
+            for (let ic of contObj.contActionSet) {
                 if (ic.actIdentCode === "*") {
+
+
+
                     retObj.json.content.columns.push(
-                        {
-                            "originalContentUrl":ic.actImgUrl,
-                            "action":{  
-                                "type":ic.actType,
-                                "label":ic.actName,
-                                "text":ic.actName,
-                                "postback": ic.nextContCode
+                        ic.actType === "message" ?
+                            {
+                                "originalContentUrl": ic.actImgUrl,
+                                "action": {
+                                    "type": ic.actType,
+                                    "label": ic.actName,
+                                    "text": ic.actName,
+                                    "postback": ic.nextContCode
+                                }
                             }
-                        }
+                            : ic.actType === "uri" ?
+                                {
+                                    "originalContentUrl": ic.actImgUrl,
+                                    "action": {
+                                        "type": ic.actType,
+                                        "label": ic.actName,
+                                        "uri": ic.nextContCode
+                                    }
+                                }
+                                : 0
                     )
-                } 
-                else { 
+                }
+                else {
                     console.log("enter image_carousel_else");
                 }
             }
             console.log(retObj.json.content);
             return retObj;
-      
+
             break;
 
         case "db_access":
@@ -205,9 +219,6 @@ let hashSearch = function (inputText, actionInstList, botInst, reqbody) {
     return retobj;
 
 };
-
-
-
 
 
 
