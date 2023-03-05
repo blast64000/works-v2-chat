@@ -194,8 +194,6 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
 
                 break;
             case "inbound":
-
-
                 resolve([
                     {
                         botId: options.it_bot,

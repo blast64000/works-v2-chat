@@ -14,8 +14,6 @@ const refreshCode = async function(){
       timeout: 3000
     });
 
-
-
     apiFunc = await thisReqConfig.post(`refresh`, {clisecret:options.clisecret});
 
     if(apiFunc.status===200){

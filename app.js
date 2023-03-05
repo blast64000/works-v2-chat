@@ -195,7 +195,8 @@ app.post("/hr", wraper(async (req, res, next) => {
         console.log(headers);
         console.log(body);
         let answerObj = await hr.vaildateMessage(req, contentInstList, botInstList, actionInstList);
-        let retMsg = await hr.responseBotMsg(answerObj, baseHeaders);
+        let retMsg = await hr.responseBotMsg(answerObj, baseHeaders,options.dbpool);
+        console.log(retMsg);
 
         logreturn = await hr.json2Text(headers, body);
         if (logreturn) {

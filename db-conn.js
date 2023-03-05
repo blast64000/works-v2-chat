@@ -54,7 +54,6 @@ exports.readMasterTable = async function(poolConfig) {
 
         throw err;
     } finally {
-        //The finally clause is always executed
         if (conn) {
             conn.end()
         };

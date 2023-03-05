@@ -133,7 +133,6 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj, sales_list) {
             }
             console.log(retObj.json.content);
             return retObj;
-
             break;
 
         case "db_access":
@@ -316,30 +315,6 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
 }
 
 let responseBotMsg = async function (objArray, baseHeaders) {
-    //    console.log(objArray);
-    /*
-        objArray[objArray.length - 1].json.content.quickReply ={
-            "items": [
-              {
-                "imageUrl": "https://illustoon.com/photo/4292.png",
-                "action": {
-                  "type": "message",
-                  "label": "좋아요",
-                  "text": "좋아요"
-                }
-              },
-              {
-                "imageUrl": "https://illustoon.com/photo/211.png",
-                "action": {
-                  "type": "message",
-                  "label": "뒤로가기",
-                  "text": "뒤로가기",
-                  "postback":"C00-F10000"
-                }
-              }
-            ]
-          }
-          */
 
     let reqConfig = axios.create({
         baseURL: `https://www.worksapis.com/v1.0/`,
