@@ -274,16 +274,18 @@ let responseBotMsg = async function (objArray, baseHeaders) {
                 console.log(ti.json.content.text.split(" ").filter(x=>x!=""));
                 console.log(ti.json.content.text.split(" ").filter(x=>x!="").length);
 
-                const response = await openai.createCompletion({
-                    "model": "text-davinci-003",
-                    "prompt": ti.json.content.text,
-                    "temperature": 0.9,
-                    "max_tokens": 2048,
+                const response = await openai.createChatCompletion({
+                    "model": "gpt-3.5-turbo",
+                    "messages":[
+                        {"role": "system", "content": "You are a helpful assistant."},
+                        {"role": "system", "content": "The people who use this assistance are employees of a Korean pharmaceutical company called Daewoong Pharmaceutical."},
+                        {"role": "user", "content": ti.json.content.text}
+                    ]
                 });
     
                 console.log(response.data);
                 console.log(response.data.choices);
-                ti.json.content.text=response.data.choices[0].text
+                ti.json.content.text=response.data.choices[0].message.content;
     
 
 
