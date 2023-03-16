@@ -279,6 +279,8 @@ let responseBotMsg = async function (objArray, baseHeaders) {
                     "messages":[
                         {"role": "system", "content": "You are a helpful assistant."},
                         {"role": "system", "content": "The people who use this assistance are employees of a Korean pharmaceutical company called Daewoong Pharmaceutical."},
+                        {"role": "system", "content": "This assistance is created and managed by the IT operation team"},
+                        {"role": "system", "content": "People who use this assistance are people who don't know much about it and ai."},
                         {"role": "user", "content": ti.json.content.text}
                     ]
                 });
