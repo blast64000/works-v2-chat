@@ -199,49 +199,60 @@ let hashSearch = function (inputText, actionInstList, botInst) {
 
 const makeQueryJson = function (qnaType, qnaText, qnaTime, qnaUserId, qnaBotId, qnaDomainID) {
 
-    let yourDate = new Date(qnaTime)
-    yourDate.setHours(yourDate.getHours() + 9);
+    try {
 
-    let queryString = ""
-    let qndID = "1"
+        let yourDate = new Date(qnaTime)
+        yourDate.setHours(yourDate.getHours() + 9);
+        console.log(yourDate.toISOString().replace(/T/, " ").replace(/Z/, ""));
+
+        let queryString = ""
+        let queryUpdateString = ""
+        let qndID = "1"
+        //text pharse 
+        switch (qnaType) {
+            case "INSERT":
 
 
-
-    //text pharse 
-    switch (qnaType) {
-        case "INSERT":
-            queryString = `INSERT INTO chat_prod.qna_ms_tb
+                queryString = `INSERT INTO chat_prod.qna_ms_tb
             (QNA_BOT_CD, QNA_INST_TIME, QNA_STATUS, QNA_DOM_CD, QNA_ASK_USER_CD, QNA_ASK_CONT,QNA_ANSW_USER_CD)
-            VALUES('${qnaBotId}', '${yourDate.toISOString()}', 'PENDING', '${qnaDomainID}', '${qnaUserId}', '${qnaText}','${options.admin_id_list[0]}');`
-            break;
-        case "LIST":
-            queryString = `SELECT * FROM chat_prod.qna_ms_tb
-            where QNA_STATUS="PENDING" and QNA_ANSW_USER_CD="${qnaUserId}" `
-            break;
-        case "ANSWER":
-            if (qnaText.split("!").length >= 3) {
-                qndID = qnaText.split("!")[1].trim()
-                queryString = `UPDATE chat_prod.qna_ms_tb SET QNA_STATUS='DONE',  QNA_ANSW_CONT='${qnaText.split("!")[2].trim()}' WHERE QNA_SEQ=${qndID} and QNA_ANSW_USER_CD="${qnaUserId}"`
+            VALUES('${qnaBotId}', '${yourDate.toISOString().replace(/T/, " ").replace(/Z/, "")}', 'PENDING', '${qnaDomainID}', '${qnaUserId}', '${qnaText}','${options.admin_id_list[0]}');`
                 break;
-            }
+            case "LIST":
+                queryString = `SELECT * FROM chat_prod.qna_ms_tb
+            where QNA_STATUS="PENDING" and QNA_ANSW_USER_CD="${qnaUserId}" `
+                break;
+            case "ANSWER":
+                console.log(qnaText.split("!").length);
+                if (qnaText.split("!").length >= 3) {
+                    qndID = qnaText.split("!")[1].trim()
+                    queryString = `SELECT QNA_ASK_USER_CD FROM chat_prod.qna_ms_tb where QNA_SEQ=${qndID}`
+                    queryUpdateString = `UPDATE chat_prod.qna_ms_tb SET QNA_STATUS='DONE',  QNA_ANSW_CONT='${qnaText.split("!")[2].trim()}' WHERE QNA_SEQ=${qndID} and QNA_ANSW_USER_CD="${qnaUserId}"`
+                    break;
+                }
+
+                else {
+                    //! command error
+                }
 
 
-            else {
-                queryString = ""
-            }
 
+            case "REJECT":
+                break;
+            default:
+                break;
+        }
+        return {
+            "json": "db_access",
+            "queryType": qnaType,
+            "queryString": queryString,
+            "queryUpdateString": queryUpdateString
+        }
 
-
-        case "REJECT":
-            break;
-        default:
-            break;
+    } catch (err) {
+        console.log(err);
     }
-    return {
-        "json": "db_access",
-        "queryType": qnaType,
-        "queryString": queryString
-    }
+
+
 }
 
 const vaildateMessage = function (req, contentInstList, botInstList, actionInstList) {
@@ -288,8 +299,15 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                                     options.admin_id_list.includes(body.source.userId) ?
                                         (
                                             console.log("admin"),
-                                            retArray.push(makeQueryJson(body.content.text.split('!')[1].toUpperCase().trim(), body.content.text.slice(1), body.issuedTime, body.source.userId, headers["x-works-botid"], body.source.domainId)),
-                                            retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: `IMPORT_VALUE.` }))
+                                            body.content.text.split('!')[1].toUpperCase().trim() === "ANSWER" ? (
+                                                retArray.push(makeQueryJson("ANSWER", body.content.text.slice(1), body.issuedTime, body.source.userId, headers["x-works-botid"], body.source.domainId)),
+                                                retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "flex" }))
+                                            )
+                                                :
+                                                (
+                                                    retArray.push(makeQueryJson(body.content.text.split('!')[1].toUpperCase().trim(), body.content.text.slice(1), body.issuedTime, body.source.userId, headers["x-works-botid"], body.source.domainId)),
+                                                    retArray.push(makeAnswerJson(headers["x-works-botid"], body, { contType: "text", contText: `IMPORT_VALUE.` }))
+                                                )
                                         ) :
                                         (
                                             console.log("not admin"),
@@ -370,6 +388,9 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
 let responseBotMsg = async function (objArray, baseHeaders, poolConfig) {
     console.log(objArray);
     let returnDataStream = ""
+    let flexRecvChangeStream=""
+    let flexRecvtextStream=""
+
     let insertRowID = 0
 
     let reqConfig = axios.create({
@@ -402,8 +423,18 @@ let responseBotMsg = async function (objArray, baseHeaders, poolConfig) {
                     //returnDataStream= JSON.stringify(rows[10]);
                 }
                 else if (ti.queryType === "ANSWER") {
-                    if (rows.affectedRows === 1) {
-                        returnDataStream = "답변이 완료되었습니다."
+                    //if (rows.affectedRows === 1) {
+                    if (rows.length === 1) {
+                        const rows2 = await conn.query(ti.queryUpdateString);
+                        if(rows2.affectedRows===1){
+                            flexRecvChangeStream=rows[0].QNA_ASK_USER_CD;
+                            returnDataStream = "답변이 완료되었습니다.";
+
+                        }
+                        else { 
+                            returnDataStream = "오류 발생.";
+                        }
+                        
                     }
                     else {
                         returnDataStream = `입력 오류 , 해당하는 문의번호가 없습니다.`
@@ -416,19 +447,26 @@ let responseBotMsg = async function (objArray, baseHeaders, poolConfig) {
                 else {
                     console.log("a");
                 }
-                
+
             }
             else {
-                
+
                 if (returnDataStream !== "") {
+                    console.log(ti);
                     ti.json.content.text = returnDataStream
-                    
+                }
+                
+                if (flexRecvChangeStream!==""){
+                    console.log("change userId")
+                    ti.json.content.text=flexRecvtextStream
+                    ti.userId=flexRecvChangeStream;
                 }
 
-                if (insertRowID>0 && ti.json.content.type==="flex"){
+                if (insertRowID > 0 && ti.json.content.type === "flex") {
                     console.log(ti.json.content.contents.contents[0].header.contents[1].text);
-                    ti.json.content.contents.contents[0].header.contents[1].text=`접수번호 : ${insertRowID}`
+                    ti.json.content.contents.contents[0].header.contents[1].text = `접수번호 : ${insertRowID}`
                 }
+
                 let startTime = 0;
                 let endTime = 0;
 

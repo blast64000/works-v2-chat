@@ -3,7 +3,7 @@ let payload = {};
 payload["refresh"]={
   "content": {
     "type": "text",
-    "text": "그룹전송 테스트입니다."
+    "text": "휴먼 오늘부로 gpt3.5-turbo로 업그레이드 되었다.\n 이 모델은 CHAT-GPT와 동일한 모델이다 \n 궁금한게 있으면 물어봐라"
   }
 }
 

@@ -73,19 +73,19 @@ const Main = async function (){
       timeout: 3000});
 
     //console.log(emailArray.length);
-    // modifyBotUser("POST",options.hero_bot,"21342","thlee310@daewoong.co.kr");    // 대화상대 추가 (이메일, options.   _bot 만 변경)
-    //sendDirectMsg("대화를 시작해봐요","jwkim023@daewoong.co.kr",1,options.it_bot);    // 대화상대 추가 (이메일, options.   _bot 만 변경)
+     //modifyBotUser("POST",options.hr_bot,"21342","2230015@daewoong.co.kr");    // 대화상대 추가 (이메일, options.   _bot 만 변경)
+     //sendDirectMsg("대화를 시작해봐요","2230015@daewoong.co.kr",1,options.hr_bot);    // 대화상대 추가 (이메일, options.   _bot 만 변경)
   
-    // get_users_email("whcho@pharmpack.co.kr");
+    // get_users_email("400be63c-719a-415c-1d5e-03237eca3754");
   
-    //sendDirectMsg("하하하하","jsjang303@daewoong.co.kr",0);
+    //sendDirectMsg("하하하하","2230022@daewoong.co.kr",0);
   
     //sendDirectMsg("하하하하","yjlee230@daewoong.co.kr",0);
-    //get_users_email("6210301@daewoong.co.kr");
+    get_users_email("2230022@daewoong.co.kr");
     //modifyBot("GET",`${options.it_bot}`,{botName:"IT운영팀 챗봇"});
     
     
-    // get_users_email("788bc85a-ecaf-4d31-1c03-037779cd927b")
+    // get_users_email("a654a117-6150-4521-1ddd-03dc98c3c1cf")
     
     
     //sendDirectMsg("챗봇 서비스를 시작합니다","jwkim023@daewoong.co.kr")
