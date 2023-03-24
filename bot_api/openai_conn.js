@@ -7,6 +7,8 @@ const { Configuration, OpenAIApi } = require("openai");
 
 const Main = async function () {
 
+    let args = process.argv.slice(2);
+    
     const configuration = new Configuration({
         apiKey: options.open_api_key_daba,
     });
@@ -17,9 +19,9 @@ const Main = async function () {
     const response = await openai.createChatCompletion({
         "model": "gpt-3.5-turbo",
         "messages": [
-            { "role": "system", "content": "You are an assistant that generates various nicknames when people read the name of a drug." },
-            { "role": "system", "content": "You must use only Korean characters when creating an alias string list. It should not generate English alphabets and numbers." },
-            { "role": "system", "content": "You must create a list of at least 5 words separated by commas character " },
+            { "role": "system", "content": "You are an assistant that generates alias string list when people read the name of a drug." },
+            { "role": "system", "content": "You must use Korean characters when creating an alias string list. It should not generate numbers." },
+            { "role": "system", "content": "You must create alias string list of more than 5 words separated by commas character " },
 
             { "role": "user", "content": "목시클정(아목시실린ㆍ클라불란산칼륨)(PTP)" }, { "role": "assistant", "content": "목시클PTP, 목시클정피티피, 목시클PTP포장, 목시클피티피, 목시클피티피포장, 목시클, 목시클정PTP포장, 목시클정피티피포장, 목시클정, 목시클정PTP" },
             { "role": "user", "content": "목시클정(아목시실린·클라부란산칼륨)(PTP)" }, { "role": "assistant", "content": "목시클PTP, 목시클정피티피, 목시클PTP포장, 목시클피티피, 목시클피티피포장, 목시클, 목시클정PTP포장, 목시클정피티피포장, 목시클정, 목시클정PTP" },
@@ -47,10 +49,8 @@ const Main = async function () {
             { "role": "user", "content": "씨프러스정(염산시프로플록사신)" }, { "role": "assistant", "content": "씨플러스정, 시프러스정, 씨플러스정염산시프로플록사신, 시플러스정, 씨프러스정염산시프로플록사신, 씨프러스정" },
             { "role": "user", "content": "액시드캡슐(니자티딘) 용기" }, { "role": "assistant", "content": "엑시드캡슐, 엑시드캅셀, 엑씨드, 액시드캅셀, 엑씨드캡슐, 엑씨드캅셀, 액씨드캡슐, 액시드캡슐, 액씨드캅셀" },
             { "role": "user", "content": "이지엔6이브 연질캡슐(병포장) (이부프로펜 + 파마브롬)" }, { "role": "assistant", "content": "이지엔식스이브연질캅셀, 이지엔식스이브연질캡슐병포장, 이지엔6이브캡슐병포장, 이지엔6이브연질캅셀병포장, 이지엔6이브이부프로펜파마브롬병포장, 이지엔식스이브캅셀병포장" },
-            
 
-            { "role": "user", "content": "대웅피오글리타존정" }
-
+            { "role": "user", "content": args[0] }
         ],
         temperature: 1,
         top_p: 1,
@@ -59,8 +59,11 @@ const Main = async function () {
     });
 
     console.log(response.data);
-    console.log(response.data.choices);
-
+    console.log(response.data.choices[0].message.content)
+        
+        response.data.choices[0].message.content.split(",").forEach( x =>
+            response.data.choices[0].message.content
+            )
 }
 
 

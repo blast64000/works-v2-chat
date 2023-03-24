@@ -8,12 +8,6 @@ const path = require("path");
 const mariadb = require('mariadb');
 const options = require("../options.js");
 
-const { Console } = require("console");
-const QueryString = require("qs");
-const { stringify } = require("querystring");
-const { isNumberObject } = require("util/types");
-const { exit } = require("process");
-
 
 let isVaildBot = function (worksBotNo, botInstList) {
     for (bi of botInstList) {

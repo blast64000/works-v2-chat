@@ -18,6 +18,7 @@ const hero = require("./app/hero");
 const fexu = require("./app/fexu.js");
 const it = require("./app/it.js");
 const hr = require("./app/hr.js");
+const hn = require("./app/hn.js");
 
 
 const app = express()
@@ -232,6 +233,34 @@ app.post("/hero", wraper(async (req, res, next) => {
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
 }));
+
+
+
+app.post("/hn", wraper(async (req, res, next) => {
+    try {
+        const { headers, body } = req;
+        console.log(headers);
+        console.log(body);
+        let answerObj = await hn.vaildateMessage(req, contentInstList, botInstList, actionInstList,saleInstList);
+        let retMsg = await hn.responseBotMsg(answerObj, baseHeaders);
+
+        logreturn = await hn.json2Text(headers, body);
+        if (logreturn) {
+            hn.log2csv(logreturn, __dirname);
+        }
+
+    } catch (err) {
+        console.log(Object.getOwnPropertyNames(err))
+        console.log(err.message);
+        console.log(err)
+        
+    }
+    // 데이터 전송
+    //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
+}));
+
+
+
 
 
 app.get("/botImgFile/*", function (req, res) {
