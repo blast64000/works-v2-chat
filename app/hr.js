@@ -9,6 +9,21 @@ const mariadb = require('mariadb');
 const options = require("../options.js");
 
 
+
+let parking_sol_date = new Date()
+parking_sol_date.setHours(parking_sol_date.getHours() + 9);
+let parking_text =`
+안녕하세요.
+향남 주차 총 150대 만차되었습니다.
+-------------------------------
+1. 근처 대웅바이오 및 운동장 이용 부탁드립니다
+■ 총 좌석 : 대웅바이오(약 60대), 운동장(약 50대)
+-------------------------------
+${parking_sol_date.toISOString().replace(/T/, " ").replace(/Z/, "").split(".",1)  }
+`
+
+
+
 let isVaildBot = function (worksBotNo, botInstList) {
     for (bi of botInstList) {
         if (bi.botWorksCode === worksBotNo) {
@@ -21,7 +36,6 @@ let isVaildBot = function (worksBotNo, botInstList) {
 
 let findCurrCont = function (postback, conList) {
     x = undefined;
-
     x = conList.find(o => o.contCode === postback);
     if (x == undefined) {
         return undefined;
@@ -138,8 +152,20 @@ let makeAnswerJson = function (worksBotId, reqbody, contObj) {
                 return retObj;
                 break;
 
-
+            case "muticase":
+                if (reqbody.source.userId === "a09643ee-bba2-4965-162c-0346848f612f"
+                    || "968890a2-dc7e-4b76-1f56-0311b6be23da") {
+                    retObj.json.content.type = "text";
+                    retObj.json.content.text = "사용자 확인";
+                    retObj.multicase = "active";
+                }
+                else {
+                    retObj.json.content.type = "text";
+                    retObj.json.content.text = "이 기능은 사용할 수 없습니다.";
+                }
+                return retObj;
                 break;
+
             default:
                 return {};
         }
@@ -277,7 +303,6 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                 //단순 텍스트 입력인 경우 
                 else if (body.content.type === "text") {
                     if (botInst) {
-
                         // # Search
                         if (body.content.text.charCodeAt(0) === 35) {
                             retArray.push(makeAnswerJson(headers["x-works-botid"], body, hashSearch(body.content.text.slice(1).toUpperCase(), actionInstList, botInst)))
@@ -369,7 +394,7 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
                 break;
 
             default:
-                resolve([0]);
+                reject()
                 break;
         }
 
@@ -379,11 +404,53 @@ const vaildateMessage = function (req, contentInstList, botInstList, actionInstL
 }
 
 
+let responseMulticasting = async function (baseHeaders) {
+    try {
+    let count=0;
+    let objArray = options.parking_list
+    let reqConfig = axios.create({
+        baseURL: `https://www.worksapis.com/v1.0/`,
+        headers: baseHeaders,
+        timeout: 3000
+    });
+
+        for await (let ti of objArray) {
+
+            let startTime = 0;
+            let endTime = 0;
+
+            startTime = new Date().getTime();
+            apiFunc = await reqConfig.post(`bots/${options.hr_bot}/users/${ti}/messages`, { "content": {type:"text", text:`${count++} : ${parking_text}`}});
+            endTime = new Date().getTime();
+            console.log(endTime - startTime);
+            await new Promise(resolve => setTimeout(resolve,
+                (endTime - startTime) > 0 ? (500 - (endTime - startTime)) : 10));
+        }
+
+    } catch (err) {
+        console.log("multicase_error");
+        console.log(err);
+
+    } finally {
+
+        let reqConfig = axios.create({
+            baseURL: `https://www.worksapis.com/v1.0/`,
+            headers: baseHeaders,
+            timeout: 3000
+        });
+        apiFunc = await reqConfig.post(`bots/${options.hr_bot}/users/2210381@daewoong.co.kr/messages`, { "content": {type:"text", text:`multicast complete` }} );
+    }
+
+}
+
+
 let responseBotMsg = async function (objArray, baseHeaders, poolConfig) {
     console.log(objArray);
+
+
     let returnDataStream = ""
-    let flexRecvChangeStream=""
-    let flexRecvtextStream=""
+    let flexRecvChangeStream = ""
+    let flexRecvtextStream = ""
 
     let insertRowID = 0
 
@@ -420,15 +487,15 @@ let responseBotMsg = async function (objArray, baseHeaders, poolConfig) {
                     //if (rows.affectedRows === 1) {
                     if (rows.length === 1) {
                         const rows2 = await conn.query(ti.queryUpdateString);
-                        if(rows2.affectedRows===1){
-                            flexRecvChangeStream=rows[0].QNA_ASK_USER_CD;
+                        if (rows2.affectedRows === 1) {
+                            flexRecvChangeStream = rows[0].QNA_ASK_USER_CD;
                             returnDataStream = "답변이 완료되었습니다.";
 
                         }
-                        else { 
+                        else {
                             returnDataStream = "오류 발생.";
                         }
-                        
+
                     }
                     else {
                         returnDataStream = `입력 오류 , 해당하는 문의번호가 없습니다.`
@@ -444,18 +511,15 @@ let responseBotMsg = async function (objArray, baseHeaders, poolConfig) {
 
             }
             else {
-
                 if (returnDataStream !== "") {
                     console.log(ti);
                     ti.json.content.text = returnDataStream
                 }
-                
-                if (flexRecvChangeStream!==""){
+                if (flexRecvChangeStream !== "") {
                     console.log("change userId")
-                    ti.json.content.text=flexRecvtextStream
-                    ti.userId=flexRecvChangeStream;
+                    ti.json.content.text = flexRecvtextStream
+                    ti.userId = flexRecvChangeStream;
                 }
-
                 if (insertRowID > 0 && ti.json.content.type === "flex") {
                     console.log(ti.json.content.contents.contents[0].header.contents[1].text);
                     ti.json.content.contents.contents[0].header.contents[1].text = `접수번호 : ${insertRowID}`
@@ -466,6 +530,8 @@ let responseBotMsg = async function (objArray, baseHeaders, poolConfig) {
 
                 startTime = new Date().getTime();
                 apiFunc = await reqConfig.post(`bots/${ti.botId}/users/${ti.userId}/messages`, ti.json);
+
+
                 endTime = new Date().getTime();
                 console.log(endTime - startTime);
                 await new Promise(resolve => setTimeout(resolve,
@@ -553,5 +619,5 @@ let log2csv = function (inpString, dirName) {
     }
 };
 
-const hr = { vaildateMessage, responseBotMsg, json2Text, log2csv, isVaildBot };
+const hr = { vaildateMessage, responseBotMsg, json2Text, log2csv, isVaildBot, responseMulticasting };
 module.exports = hr;

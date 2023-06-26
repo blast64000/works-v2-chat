@@ -195,9 +195,19 @@ app.post("/hr", wraper(async (req, res, next) => {
         const { headers, body } = req;
         console.log(headers);
         console.log(body);
+
+
+
         let answerObj = await hr.vaildateMessage(req, contentInstList, botInstList, actionInstList);
-        let retMsg = await hr.responseBotMsg(answerObj, baseHeaders,options.dbpool);
-        console.log(retMsg);
+        let retMsg="";
+
+        if(answerObj[0].multicase==="active"){
+            console.log("multicasting please ");
+            await hr.responseMulticasting(baseHeaders);
+        }
+        else{
+            retMsg = await hr.responseBotMsg(answerObj, baseHeaders,options.dbpool);
+        }
 
         logreturn = await hr.json2Text(headers, body);
         if (logreturn) {
@@ -258,10 +268,6 @@ app.post("/hn", wraper(async (req, res, next) => {
     // 데이터 전송
     //postback으로 받는 데이터로 여러 입력을 처리할 수있어야됨
 }));
-
-
-
-
 
 app.get("/botImgFile/*", function (req, res) {
     try {
